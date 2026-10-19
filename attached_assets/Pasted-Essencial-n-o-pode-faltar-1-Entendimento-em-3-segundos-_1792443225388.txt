@@ -1,0 +1,53 @@
+Essencial (não pode faltar)
+
+1. Entendimento em 3 segundos
+Quem entra no meio da partida precisa saber o que fazer sem ler nada. Deixe fixa na tela uma faixa “como participar”: ícone de cada presente, o valor em votos e o lado dele. Se a pessoa precisa perguntar no chat, você já perdeu ela.
+
+2. Tensão constante no placar
+Partida decidida cedo faz todo mundo sair. Alguns mecanismos que mantêm a disputa viva:
+
+Barra elástica que reage a cada voto e treme quando a diferença é pequena.
+Últimos 60 segundos com votos em dobro (anunciado com antecedência na tela, para ser transparente).
+Prorrogação: se a liderança mudar nos últimos segundos, o tempo estende 20 a 30s.
+Alertas como “Maria está a 3% de virar!”.
+
+3. Reconhecimento de quem manda presente
+Status é o que mais motiva a doar. Presentes grandes merecem tela cheia com avatar, nome e frase (“JOÃO ENTROU PRA DECIDIR!”). Mantenha também o Top 3 de apoiadores de cada lado, com troca de posição animada.
+
+4. Escada de animações
+Presente pequeno gera efeito pequeno, médio gera efeito maior, épico gera cena de tela cheia. Assim quem quer ver o efeito grande tem motivo para subir o valor. Acrescente combos (“x10 COMBO!”) quando alguém manda em sequência.
+
+5. Papel para quem não manda presente
+Likes e comentários devem mover algo no jogo, senão a maioria só assiste passivamente. Algumas ideias:
+
+Likes carregam uma “barra de energia” de cada lado, que dá um bônus ou efeito visual quando enche.
+Comentário !a ou !b mostra uma torcida animada na tela.
+
+Mantenha o impacto no placar pequeno, para o presente continuar valendo mais.
+
+6. Narrador automático
+Frases e sons em momentos-chave (“VIRADA!”, “ESTÁ DISPARANDO!”, “FALTAM 10 SEGUNDOS!”). Um locutor por texto na tela, com voz opcional, dá sensação de evento ao vivo mesmo com poucos espectadores.
+
+7. Ritmo em rodadas curtas
+Partidas de 5 a 10 minutos, com “Rodada 2 de 5”, intervalo de 20 a 30s mostrando o resultado e anunciando a próxima. Cada intervalo é um ponto de entrada para quem chegou agora e um motivo para ficar. Complemente com um placar acumulado do campeonato.
+
+8. Final marcante
+Câmera lenta nos últimos 5 segundos, silêncio dramático e explosão na vitória. Em seguida: ranking dos apoiadores, vencedor com confete e um “REVANCHE?” já contando.
+
+Multiplicadores (o que deixa viciante)
+Metas coletivas: “faltam 300 pontos para liberar o raio do João”. Marcos desbloqueiam efeitos visuais e dão motivo para o grupo se organizar.
+Eventos surpresa: “Chuva de bônus” ou “Hora X2” por 15 segundos, com aviso na tela. Quebra a monotonia.
+Power-ups opcionais: um dos 5 presentes de cada lado pode ativar um efeito (escudo, congelar o placar do rival por poucos segundos). Dá estratégia, mas deve ser bem explicado, senão confunde.
+Hall da fama diário: maiores apoiadores da live e sequência de vitórias de cada candidato, que dão motivo para voltar.
+Música dinâmica: a trilha de fundo intensifica conforme a diferença diminui.
+Técnico (que muita gente esquece)
+Zona segura do TikTok: a interface do app cobre a parte inferior e o lado direito da tela da live. Mantenha o que importa (placar, avatares, faixa de presentes) no topo e no centro. Confira no próprio celular durante o teste.
+Legibilidade no celular: fontes grandes, alto contraste, contorno nos textos sobre o fundo.
+Áudio equilibrado: hierarquia de volumes, para que presente grande destaque mas não estoure o ouvido.
+60 fps com rajadas, usando a fila e o agrupamento que já estão no prompt.
+Linha do tempo de métricas: grave presentes por minuto e número de espectadores ao longo da partida. Depois você vê em que momento a audiência cai e ajusta.
+Cuidados
+
+Mantenha as regras claras e visíveis (valores, bônus, prorrogação) e não prometa retorno nem induza presente de forma enganosa. Revise as regras de LIVE do TikTok sobre incentivo a presentes, porque elas mudam e o risco é na sua conta.
+
+Se quiser, transformo isso em um prompt de melhorias no mesmo formato do anterior, já separado em marcos para você aplicar por cima do projeto.
