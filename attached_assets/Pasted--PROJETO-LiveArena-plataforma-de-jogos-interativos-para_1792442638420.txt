@@ -1,0 +1,127 @@
+# PROJETO: LiveArena — plataforma de jogos interativos para TikTok LIVE
+
+## 1. OBJETIVO
+Construir uma plataforma web com um PAINEL onde o streamer (eu) vê a biblioteca de jogos disponíveis, configura uma partida e a inicia. Os jogos reagem em tempo real aos eventos da minha live no TikTok (presentes, likes, comentários). A arquitetura deve permitir ADICIONAR NOVOS JOGOS no futuro sem mexer no núcleo. Já deve vir com UM jogo pronto: "Batalha de Votos".
+
+Todo o texto da interface deve estar em português do Brasil (pt-BR).
+
+## 2. STACK
+- Monorepo (pnpm workspaces): apps/web, apps/server, packages/shared
+- Front: React + TypeScript + Vite + Tailwind. Animações: Framer Motion e/ou PixiJS (canvas) para partículas e efeitos pesados
+- Back: Node.js + TypeScript + Fastify (ou Express) + WebSocket (ws ou Socket.IO)
+- Banco: SQLite com Prisma (fácil de migrar para Postgres)
+- Validação: zod em todas as entradas (REST e WebSocket)
+- Testes: Vitest
+- Leitura da live: biblioteca tiktok-live-connector (não oficial)
+
+## 3. ARQUITETURA
+### 3.1 Camada de conexão com o TikTok (isolada)
+- Criar uma interface `LiveProvider` (connect, disconnect, onEvent, getAvailableGifts) e uma implementação com tiktok-live-connector.
+- O resto do sistema NUNCA importa a biblioteca diretamente. Isso permite trocar depois por um serviço gerenciado (EulerStream, TikTool etc.) sem reescrever nada.
+- Consultar a documentação/tipos da versão instalada: os nomes dos campos dos eventos mudam entre versões. Não assumir nomes de campos de memória.
+- Normalizar tudo para eventos internos: `gift`, `like`, `chat`, `follow`, `share`, `member_join`, `live_end`, `connection_status`.
+- Evento `gift` normalizado: { eventId, giftId, giftName, giftImageUrl, diamondValue, repeatCount, user: { id, nickname, avatarUrl }, timestamp }.
+- Tratar STREAK de presentes: presentes enviados em sequência disparam vários eventos. Contar apenas o DELTA entre eventos da mesma sequência (para animar em tempo real sem contar em dobro). Deduplicar por eventId/msgId.
+- Reconexão automática com backoff exponencial; status da conexão visível no painel (conectando, conectado, reconectando, erro).
+- Modo SIMULADOR (essencial): endpoint e tela de desenvolvedor para disparar presentes/likes/comentários falsos, com rajadas (ex.: 200 presentes em 3 segundos), para testar sem estar ao vivo.
+
+### 3.2 Sistema de jogos (plugins)
+Cada jogo é um módulo em `packages/games/<id-do-jogo>` que exporta:
+- `manifest`: id, nome, descrição, thumbnail, versão, categoria, formatos suportados
+- `configSchema` (zod) + componente React `ConfigForm` (tela de configuração da partida)
+- componente React `GameScreen` (tela do jogo que vai para a live)
+- `reducer`/lógica pura: (estado, evento, config) => novo estado (fácil de testar)
+- Um `registry` central lista os jogos. Adicionar um jogo novo = criar a pasta + registrar uma linha.
+- Rota do painel gera a tela de configuração automaticamente a partir do módulo do jogo.
+
+### 3.3 Fluxo de uma partida
+1. Painel: escolher jogo → configurar → salvar partida (status: rascunho/pronta)
+2. Iniciar partida → backend conecta na live do usuário TikTok informado → bloqueia edição da configuração
+3. A URL `/play/:matchId` é a tela do jogo, aberta como "Browser Source" no OBS ou capturada no TikTok LIVE Studio. Ela recebe estado e eventos por WebSocket
+4. Encerrar partida → salva resultado final e histórico
+
+IMPORTANTE: a tela `/play/:matchId` deve ter fundo transparente opcional, suportar formato vertical (9:16) e horizontal (16:9) via parâmetro de URL ou configuração, e escalar corretamente para qualquer resolução. Sem barras de rolagem, sem cursor, sem elementos de painel.
+
+## 4. PAINEL (primeira entrega)
+Páginas:
+- Login simples (um usuário admin via variáveis de ambiente, sessão por cookie httpOnly)
+- **Biblioteca de jogos**: cards coloridos com thumbnail, nome, descrição e botão "Criar partida". Já com "Batalha de Votos" e espaços visuais "Em breve" para jogos futuros
+- **Criar/editar partida**: formulário gerado pelo módulo do jogo
+- **Minhas partidas**: lista com status, data, botões: editar, duplicar, iniciar, ver resultado
+- **Tela de controle ao vivo** (durante a partida): status da conexão, placar em tempo real, log de eventos recentes, botões encerrar / reiniciar partida, link copiável da tela do jogo, indicador de espectadores
+- **Configurações**: usuário do TikTok (@), chave de API de assinatura (opcional, se a biblioteca exigir), idioma, volume padrão dos sons
+- **Simulador** (visível apenas em modo desenvolvimento ou com toggle)
+Visual do painel: moderno, escuro, com acentos coloridos, totalmente responsivo.
+
+## 5. JOGO 1: "BATALHA DE VOTOS"
+### 5.1 Configuração (tudo definido ANTES de iniciar a live e bloqueado durante a partida)
+- Título da partida (opcional)
+- Candidato A e Candidato B: nome, cor principal, imagem/avatar (upload opcional)
+- 5 presentes para CADA lado (exatamente 5 por candidato):
+  - Seleção a partir da lista oficial de presentes do TikTok (nome, imagem, custo em moedas), com busca
+  - Identificar o presente por ID, não por nome
+  - Um presente não pode estar nos dois lados
+  - Cada presente tem um VALOR configurável (quantos votos/pontos vale)
+  - Se a lista de presentes não carregar, permitir cadastro manual (nome + ID + imagem)
+- Plano de fundo da partida: upload de imagem (jpg/png/webp, limite de tamanho, validação de tipo) com pré-visualização. Cada partida pode ter um fundo diferente. Aceitar vídeo curto em loop como opcional
+- Duração: sem limite ou com cronômetro (ex.: 5, 10, 30 minutos)
+- Regra de empate ao final: empate declarado ou prorrogação de 60 segundos
+- Opções extras (desligadas por padrão): likes contam como votos para um lado escolhido; comando de comentário (ex.: !a / !b) soma 1 voto
+- Botão "Pré-visualizar" que abre a tela do jogo com o simulador
+
+### 5.2 Lógica
+- Presente configurado chega → soma (valor × quantidade) ao candidato do lado correspondente
+- Presentes que não estão na configuração são ignorados no placar (pode aparecer um aviso discreto opcional na tela)
+- Estado mantido no servidor (fonte da verdade) e enviado ao front; a tela do jogo pode ser recarregada sem perder o placar
+- Todos os eventos da partida são gravados em banco para histórico, ranking e auditoria
+
+### 5.3 Tela do jogo (visual e animações) — PRECISA SER MUITO COLORIDA E CHAMATIVA
+- Fundo: a imagem da partida, com leve overlay para dar contraste
+- Cabeçalho com título, cronômetro e indicador "AO VIVO"
+- Dois candidatos grandes (avatar + nome) nos lados, com as cores deles
+- Barra de disputa central tipo cabo de guerra: a linha de divisão se move com animação elástica conforme a proporção de votos; mostrar porcentagem e pontos de cada lado
+- A cada presente: animação com a imagem do presente voando até o candidato, explosão de partículas/confete nas cores do lado, número flutuante "+50", tremor leve no avatar e som
+- Presentes de maior valor disparam animações MAIORES (efeito escalonado: pequeno / médio / épico, com tela cheia para os épicos)
+- Feed lateral com avatar e nome de quem mandou o presente
+- Top 3 apoiadores de cada lado, atualizados em tempo real
+- Efeito de VIRADA quando a liderança muda (flash, texto "VIRADA!", som)
+- Aviso quando faltar 1 minuto e contagem final dos últimos 10 segundos
+- Tela final: vencedor com chuva de confete, ranking dos maiores apoiadores, placar final
+- Fila de animações com limite e agrupamento: se chegarem muitos presentes de uma vez, agrupar ("x25") em vez de travar. Manter 60 fps
+- Sons com controle de volume e mute; fontes grandes, bold, legíveis em tela de celular
+
+## 6. BACKEND — ENDPOINTS E TEMPO REAL
+- REST: autenticação, CRUD de partidas, upload de fundos/avatares (validação de tipo e tamanho, nomes de arquivo seguros), listar presentes disponíveis, iniciar/encerrar partida, histórico
+- WebSocket: salas por matchId; eventos `state`, `gift_animation`, `connection_status`, `match_end`
+- Um único processo gerencia as conexões com o TikTok; evitar conexões duplicadas para o mesmo @usuário
+- Logs estruturados, tratamento global de erros, variáveis de ambiente documentadas em `.env.example`
+
+## 7. MODELO DE DADOS (mínimo)
+- Match: id, gameId, title, status (draft | ready | live | finished), config (JSON), backgroundPath, createdAt, startedAt, endedAt, result (JSON)
+- MatchEvent: id, matchId, type, payload (JSON), createdAt
+- Setting: chave/valor (usuário TikTok, volume padrão etc.)
+- Asset: id, tipo, caminho, tamanho, createdAt
+
+## 8. QUALIDADE
+- TypeScript strict, ESLint e Prettier
+- Testes unitários obrigatórios: lógica de pontuação, tratamento de streak (sem contagem dupla), deduplicação e validação da configuração
+- Teste de carga com o simulador (rajada de presentes) mostrando que a interface não trava
+- README com: como rodar, como configurar o usuário do TikTok, como abrir a tela do jogo no OBS/TikTok LIVE Studio e como criar um novo jogo (guia curto de 1 página)
+
+## 9. ORDEM DE IMPLEMENTAÇÃO (parar e me mostrar ao fim de cada marco)
+1. Estrutura do monorepo, banco, login e layout do painel
+2. Sistema de plugins + biblioteca de jogos + cadastro de partidas
+3. LiveProvider com tiktok-live-connector + simulador + WebSocket
+4. Batalha de Votos: configuração completa (presentes, valores, fundo)
+5. Batalha de Votos: tela do jogo com todas as animações e sons
+6. Tela de controle ao vivo, histórico e tela final
+7. Testes, robustez (reconexão, fila de animações) e README
+
+## 10. FORA DO ESCOPO POR ENQUANTO (deixar o código preparado)
+Multiusuário/vários streamers, cobrança, mais jogos, tradução da interface.
+
+## 11. REGRAS PARA VOCÊ (IA)
+- Antes de codar, mostre um plano curto da estrutura de pastas e confirme as premissas.
+- Não invente nomes de campos ou métodos da biblioteca do TikTok: leia os tipos/documentação instalados.
+- Prefira código simples e comentado nos pontos críticos (streak, reconexão, pontuação).
+- Avise sobre qualquer limitação conhecida: a leitura da live é feita por biblioteca NÃO oficial e pode quebrar se o TikTok mudar algo.
