@@ -10,6 +10,7 @@ import {
 } from '@workspace/api-client-react';
 import {
   Activity,
+  ArrowLeft,
   ArrowRight,
   BarChart3,
   Check,
@@ -17,6 +18,7 @@ import {
   Eye,
   EyeOff,
   Gamepad2,
+  Info,
   Layers3,
   LogOut,
   Radio,
@@ -27,11 +29,12 @@ import {
   UsersRound,
   Zap,
 } from 'lucide-react';
-import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
+import { Link, Route, Switch, useLocation, useParams, Router as WouterRouter } from 'wouter';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import { availableGames, findAvailableGame, futureGames } from '@/games/registry';
 
 const queryClient = new QueryClient();
 
@@ -181,7 +184,12 @@ function Login() {
   );
 }
 
-function NavItem({ icon: Icon, children, active = false }: { icon: typeof Activity; children: ReactNode; active?: boolean }) {
+function NavItem({ icon: Icon, children, active = false, href }: { icon: typeof Activity; children: ReactNode; active?: boolean; href?: string }) {
+  if (href) return (
+    <Link href={href} className={`nav-item ${active ? 'active' : ''}`} aria-current={active ? 'page' : undefined} data-testid={`nav-${href === '/games' ? 'games' : 'overview'}`}>
+      <Icon size={16} strokeWidth={1.8} /><span>{children}</span>
+    </Link>
+  );
   return (
     <div className={`nav-item ${active ? 'active' : 'disabled'}`} aria-current={active ? 'page' : undefined} data-testid={active ? 'nav-overview' : undefined}>
       <Icon size={16} strokeWidth={1.8} />
@@ -240,7 +248,7 @@ function Dashboard() {
         <div className="side-label">PAINEL</div>
         <nav aria-label="Navegação principal">
           <NavItem icon={BarChart3} active>Visão geral</NavItem>
-          <NavItem icon={Gamepad2}>Biblioteca de jogos</NavItem>
+          <NavItem icon={Gamepad2} href="/games">Biblioteca de jogos</NavItem>
           <NavItem icon={Swords}>Partidas</NavItem>
           <NavItem icon={Radio}>Conexão TikTok LIVE</NavItem>
         </nav>
@@ -254,7 +262,7 @@ function Dashboard() {
           </button>
         </div>
       </aside>
-      <div className="mobile-top"><Brand /><button onClick={signOut} disabled={logout.isPending} className="btn-quiet" data-testid="button-logout-mobile">{logout.isPending ? 'Saindo…' : 'Sair'}</button></div>
+      <div className="mobile-top"><Brand /><div className="mobile-actions"><Link href="/games" className="btn-quiet" data-testid="link-games-mobile">Jogos</Link><button onClick={signOut} disabled={logout.isPending} className="btn-quiet" data-testid="button-logout-mobile">{logout.isPending ? 'Saindo…' : 'Sair'}</button></div></div>
       <div className="main-area">
         <header className="topbar">
           <div className="top-breadcrumb">Painel <span className="mx-2 text-[#555b69]">/</span> <span className="text-[#c3c7cf]">Visão geral</span></div>
@@ -318,11 +326,111 @@ function Dashboard() {
   );
 }
 
+function GameShell({ children, pageTitle, active }: { children: ReactNode; pageTitle: string; active: 'games' | 'configure' }) {
+  const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  const session = useGetAuthSession();
+  const logout = useLogoutAdmin();
+
+  useEffect(() => {
+    if (!session.isLoading && !session.isError && !session.data?.authenticated) setLocation('/login');
+  }, [session.isLoading, session.isError, session.data?.authenticated, setLocation]);
+
+  if (session.isLoading) return <LoadingScreen />;
+  if (session.isError) return <QueryError title="Não foi possível verificar o acesso" onRetry={() => void session.refetch()} />;
+  if (!session.data?.authenticated) return <LoadingScreen />;
+
+  const signOut = () => logout.mutate(undefined, {
+    onSuccess: (authSession) => {
+      queryClient.setQueryData(getGetAuthSessionQueryKey(), authSession);
+      queryClient.removeQueries({ queryKey: getGetDashboardSummaryQueryKey() });
+      setLocation('/login');
+    },
+  });
+  const username = session.data.username || 'Administrador';
+  return <div className="app-shell">
+    <aside className="sidebar">
+      <Brand />
+      <div className="side-label">PAINEL</div>
+      <nav aria-label="Navegação principal">
+        <NavItem icon={BarChart3} href="/">Visão geral</NavItem>
+        <NavItem icon={Gamepad2} href="/games" active={active === 'games' || active === 'configure'}>Biblioteca de jogos</NavItem>
+        <NavItem icon={Swords}>Partidas</NavItem>
+        <NavItem icon={Radio}>Conexão TikTok LIVE</NavItem>
+      </nav>
+      <div className="sidebar-bottom">
+        <div className="live-status"><div className="flex items-center gap-2"><span className="live-pulse" /><span className="text-[10px] font-bold text-[#e7e7df]">Central pronta</span></div><p className="mb-0 mt-2 text-[9px] leading-relaxed text-[#828998]">Prepare as regras antes de iniciar uma partida.</p></div>
+        <button onClick={signOut} disabled={logout.isPending} className="nav-item mt-3 w-full border-0 bg-transparent text-left" data-testid="button-logout"><LogOut size={16} /><span>{logout.isPending ? 'Saindo…' : 'Sair da conta'}</span></button>
+      </div>
+    </aside>
+      <div className="mobile-top"><Brand /><div className="mobile-actions"><Link href="/games" className="btn-quiet" data-testid="link-games-mobile">Jogos</Link><button onClick={signOut} disabled={logout.isPending} className="btn-quiet" data-testid="button-logout-mobile">{logout.isPending ? 'Saindo…' : 'Sair'}</button></div></div>
+    <div className="main-area">
+      <header className="topbar">
+        <div className="top-breadcrumb"><Link href="/" className="breadcrumb-link">Painel</Link><span className="mx-2 text-[#555b69]">/</span><span className="text-[#c3c7cf]">{pageTitle}</span></div>
+        <div className="top-user"><div className="text-right"><div className="text-[10px] font-bold text-[#dbded9]" data-testid="text-username">{username}</div><div className="mt-1 text-[8px] tracking-wide text-[#757b8b]">ADMINISTRADOR</div></div><div className="avatar-initial" aria-hidden="true">{username.slice(0, 1).toUpperCase()}</div></div>
+      </header>
+      <main className="content-wrap game-content">
+        {logout.isError && <p className="form-error mb-4" role="alert" data-testid="status-logout-error">Não foi possível encerrar a sessão. Tente novamente.</p>}
+        {children}
+      </main>
+    </div>
+  </div>;
+}
+
+function GamesLibrary() {
+  return <GameShell pageTitle="Biblioteca de jogos" active="games">
+    <div className="eyebrow">ESCOLHA O FORMATO DA SUA LIVE</div>
+    <div className="library-heading">
+      <div><h1 className="page-title" data-testid="heading-game-library">Biblioteca de jogos</h1><p className="page-subtitle">Regras claras para transformar a conversa em participação.</p></div>
+      <span className="library-count" data-testid="text-library-count">{String(availableGames.length).padStart(2, '0')} DISPONÍVEL{availableGames.length === 1 ? '' : 'IS'}</span>
+    </div>
+    <section className="available-games" aria-label="Jogos disponíveis">
+      {availableGames.map((game, index) => {
+        const manifest = game.plugin.manifest;
+        return <article className="featured-game" key={game.id} data-testid={`card-game-${game.id}`}>
+          <div className="featured-art" style={{ background: manifest.thumbnail }}><span className="featured-ring" /><div className="featured-emblem"><Swords size={38} /></div><span className="featured-tag">{manifest.category.toLocaleUpperCase('pt-BR')}</span></div>
+          <div className="featured-copy"><span className="game-version">LIVEARENA ORIGINAL · V{manifest.version}</span><h2>{manifest.name}</h2><p>{manifest.description}</p><div className="game-meta">{manifest.formats.map((format) => <span key={format}>{format}</span>)}<span>5 presentes por lado</span></div>
+            <Link href={`/games/${game.id}/configure`} className="game-create-button" data-testid={`button-create-match-${game.id}`}>Criar partida <ArrowRight size={15} /></Link>
+          </div>
+          <div className="feature-index">{String(index + 1).padStart(2, '0')}</div>
+        </article>;
+      })}
+    </section>
+    <div className="library-subhead"><div><span className="eyebrow">EM DESENVOLVIMENTO</span><h2>Mais jeitos de jogar</h2></div><p>Novos formatos serão adicionados à biblioteca.</p></div>
+    <section className="future-games" aria-label="Próximos jogos">
+      {futureGames.map((game, index) => <article className="future-game-card" key={game.id} style={{ '--game-paint': game.thumbnail } as CSSProperties} data-testid={`card-game-${game.id}`}>
+        <div className="future-game-art"><span>{String(index + 2).padStart(2, '0')}</span><i /></div><div className="future-card-copy"><span className="future-label">EM BREVE</span><h3>{game.name}</h3><p>{game.description}</p><span className="future-category">{game.category}</span></div>
+      </article>)}
+    </section>
+    <div className="footer-note">LIVEARENA · BIBLIOTECA DE JOGOS</div>
+  </GameShell>;
+}
+
+function ConfigureGame() {
+  const { gameId = '' } = useParams<{ gameId: string }>();
+  const game = findAvailableGame(gameId);
+  const GameConfig = game?.plugin.ConfigForm;
+  const name = game?.plugin.manifest.name || 'Jogo não encontrado';
+  return <GameShell pageTitle={name} active="configure">
+    <div className="configure-topline"><Link href="/games" className="text-link" data-testid="link-config-back"><ArrowLeft size={14} /> Voltar à biblioteca</Link><span className="setup-badge"><span /> CONFIGURAÇÃO LOCAL</span></div>
+    {game && GameConfig ? <>
+      <div className="configure-heading">
+        <div><div className="eyebrow">MÓDULO DE JOGO <span className="heading-divider">/</span> CONFIGURAÇÃO</div><h1 className="page-title" data-testid="heading-configure">{name}</h1><p className="page-subtitle">Defina as regras do módulo antes de iniciar sua live.</p></div>
+        <div className="config-progress" aria-label="Marco 1 de 7"><span>MARCO</span><strong>01</strong><i>de 07</i></div>
+      </div>
+      <div className="config-notice" data-testid="status-config-scope"><Info size={15} /><span>Esta etapa valida regras e arquivos localmente. Ela não cria nem salva partidas.</span></div>
+      <GameConfig />
+    </> : <section className="game-scaffold" role="status" data-testid="status-game-not-found"><div className="eyebrow">MÓDULO INDISPONÍVEL</div><h2>Este jogo não está disponível para configuração.</h2><p>Escolha um módulo ativo na biblioteca.</p><Link href="/games" className="text-link">Voltar à biblioteca</Link></section>}
+  </GameShell>;
+}
+
 function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/login" component={Login} />
+        <Route path="/games" component={GamesLibrary} />
+        <Route path="/games/:gameId/configure" component={ConfigureGame} />
         <Route path="/" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>

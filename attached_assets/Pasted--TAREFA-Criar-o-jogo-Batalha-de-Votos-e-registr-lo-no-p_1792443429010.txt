@@ -1,0 +1,99 @@
+# TAREFA: Criar o jogo "Batalha de Votos" e registrá-lo no painel LiveArena
+
+## 0. COMO TRABALHAR
+- ANTES de codar: leia a estrutura atual do projeto (pastas, registry de jogos, rotas, modelos do banco, LiveProvider, WebSocket, simulador) e SIGA os padrões existentes. Mostre um plano curto (arquivos que vai criar/alterar) e só então implemente.
+- Se o sistema de plugins de jogos ainda NÃO existir, crie o mínimo: um módulo de jogo exporta `manifest`, `configSchema` (zod), `ConfigForm`, `GameScreen` e um reducer puro `(estado, evento, config) => novoEstado`, e um registry central lista os jogos.
+- Não invente nomes de campos/métodos da biblioteca do TikTok: leia os tipos instalados.
+- Interface toda em português do Brasil.
+- Pare e me mostre o resultado ao fim de cada marco da seção 9.
+
+## 1. REGISTRO NO PAINEL
+- Módulo em `packages/games/batalha-de-votos` com manifest: id "batalha-de-votos", nome "Batalha de Votos", descrição curta, thumbnail colorida, categoria "Votação", formatos suportados (vertical 9:16 e horizontal 16:9), versão.
+- Registrar no registry: o jogo deve aparecer como card na Biblioteca de jogos com botão "Criar partida", que leva ao formulário de configuração gerado pelo módulo.
+- Manter cards "Em breve" para jogos futuros.
+
+## 2. CONFIGURAÇÃO DA PARTIDA (zod + ConfigForm)
+Tudo é definido ANTES de iniciar a live e fica BLOQUEADO durante a partida.
+- Título da partida (opcional).
+- Candidato A e B: nome, cor principal, avatar (upload opcional).
+- EXATAMENTE 5 presentes por candidato: escolhidos da lista de presentes do TikTok (nome, imagem, custo em moedas) com busca; identificar por ID, não por nome; um presente não pode estar nos dois lados; cada presente tem um VALOR (votos) configurável. Se a lista não carregar, permitir cadastro manual (nome, ID, imagem).
+- Fundo da partida: upload de imagem (jpg/png/webp, validar tipo e tamanho) com pré-visualização; vídeo curto em loop opcional. Cada partida pode ter um fundo diferente.
+- Formato da tela: vertical 9:16 ou horizontal 16:9.
+- Modo: "Partida única" ou "Campeonato" (melhor de 3 ou 5 rodadas, com placar acumulado).
+- Duração por rodada (ex.: 5, 10, 30 min) e duração do intervalo entre rodadas (20 a 30 s).
+- Regra de empate: declarar empate ou prorrogação.
+- Mecânicas de tensão (cada uma com toggle, ligadas por padrão exceto onde indicado):
+  - Votos em DOBRO nos últimos 60 s (aviso na tela 10 s antes).
+  - Prorrogação automática: se a liderança mudar nos últimos 10 s, estender 20 s (limite máximo de 2 extensões).
+- Participação sem presente (toggle): likes enchem uma barra de energia de cada lado (ao encher, efeito visual e bônus pequeno de pontos com teto); comando de comentário !a / !b soma torcida animada (máx. 1 por usuário a cada 10 s, impacto mínimo no placar).
+- Metas coletivas (opcional): lista de marcos por candidato (ex.: "300 pontos libera o raio do João") que desbloqueiam efeitos visuais.
+- Eventos surpresa (toggle): "Hora X2" e "Chuva de bônus" por 15 s em momentos aleatórios, sempre anunciados na tela.
+- Power-ups (DESLIGADO por padrão): permitir marcar 1 dos 5 presentes de cada lado como power-up (escudo ou congelar placar do rival por poucos segundos), com regra explicada na tela.
+- Níveis de animação: limites configuráveis para efeito pequeno / médio / épico (por valor do presente).
+- Narrador: texto na tela ligado/desligado; voz opcional.
+- Volume dos sons e botão de mute.
+- Presets: "Partida rápida" (5 min, 1 rodada) e "Campeonato" (3 rodadas).
+- Botão "Pré-visualizar" que abre a tela do jogo com o simulador.
+
+## 3. LÓGICA (reducer puro, fonte da verdade no servidor)
+Estados: aguardando → contagem inicial → rodando → prorrogação → intervalo → finalizado.
+- Presente configurado: soma (valor × quantidade × multiplicador ativo) ao lado correspondente. Presentes fora da configuração são ignorados no placar.
+- Tratar STREAK: contar apenas o delta entre eventos da mesma sequência; deduplicar por ID de evento.
+- Multiplicador ativo (dobro final, Hora X2) é sempre exibido na tela.
+- Combo: mesmo usuário enviando presentes em sequência (janela de ~5 s) gera contador "xN COMBO" apenas visual, sem alterar o valor.
+- Detectar VIRADA (mudança de liderança) e "quase virando" (diferença < 3%) para disparar narração e efeitos.
+- Metas coletivas e energia de likes: calcular e disparar desbloqueios.
+- Campeonato: acumular vitórias por rodada e declarar o campeão.
+- Métricas: a cada 10 s gravar presentes/min, espectadores e diferença de placar.
+- Estado persistido: recarregar a tela do jogo NÃO pode perder placar, rodada nem cronômetro.
+
+## 4. TELA DO JOGO (/play/:matchId) — MUITO COLORIDA E CHAMATIVA
+- Respeitar a ZONA SEGURA do TikTok: placar, avatares e faixa de presentes no topo/centro; evitar a parte inferior e a lateral direita. Fundo transparente opcional, sem cursor nem barras de rolagem, escala para qualquer resolução.
+- Faixa fixa "COMO PARTICIPAR": ícone de cada presente, valor em votos e lado. Sempre visível para quem entra no meio da partida.
+- Cabeçalho: título, cronômetro, "AO VIVO", "Rodada X de Y".
+- Candidatos grandes com avatar, nome e cor; barra central tipo cabo de guerra com movimento elástico, porcentagem e pontos; a barra treme quando a diferença é pequena.
+- Escada de animações: pequeno (voo do presente até o candidato, partículas, "+valor"), médio (efeito maior + tremor + som) e épico (cena de tela cheia com avatar, nome e frase do doador).
+- Feed lateral de doadores e Top 3 apoiadores de cada lado com troca de posição animada.
+- Narrador em texto ("VIRADA!", "ESTÁ DISPARANDO!", "FALTAM 10 SEGUNDOS!") e banners de eventos (Hora X2, dobro final, prorrogação).
+- Fase ociosa (sem presentes): animações ambiente e mensagens rotativas de chamada ("Mande [presente] pro [candidato]!").
+- Últimos 60 s: visual mais intenso; últimos 10 s: contagem grande; últimos 5 s: câmera lenta; vitória com explosão, confete e ranking dos apoiadores; tela de intervalo com resultado da rodada e placar do campeonato; "REVANCHE?" com contagem ao final.
+- Música dinâmica que intensifica conforme a diferença diminui; hierarquia de volumes (presente épico destaca sem estourar).
+- Fila de animações com limite e agrupamento ("x25") para rajadas; manter 60 fps; limite de partículas simultâneas.
+- Fontes grandes, bold, com contorno e alto contraste (legível em celular).
+
+## 5. BACKEND
+- Handler do jogo plugado ao pipeline de eventos existente (LiveProvider → eventos normalizados → reducer → WebSocket).
+- Novos eventos WebSocket: `round_state`, `lead_change`, `bonus_event`, `goal_unlocked`, `animation` (com nível), `match_end`.
+- Persistência: MatchEvent (já existente), MatchMetric (matchId, timestamp, giftsPerMin, viewers, scoreDiff), Supporter (agregado diário: usuário, total de pontos, lado) e resultado de cada rodada.
+- Endpoints novos: métricas da partida, hall da fama do dia, disparar evento surpresa manualmente.
+
+## 6. PAINEL (integração)
+- Tela de controle ao vivo: status da conexão, placar, log de eventos, botões: encerrar, encerrar rodada, disparar evento surpresa, mute; link copiável de /play/:matchId e aviso lembrando de checar a zona segura no celular.
+- Resultado da partida: gráfico de presentes/min e espectadores ao longo do tempo, maiores apoiadores, histórico das rodadas.
+- Página "Hall da fama": maiores apoiadores do dia e sequência de vitórias por candidato.
+- Simulador com cenários prontos: "Virada no final", "Rajada de presentes", "Partida morna" e "Combo de um doador".
+
+## 7. QUALIDADE
+- Testes (Vitest) para: pontuação, streak sem contagem dupla, deduplicação, janela do dobro, limite de prorrogação, combo, energia de likes, acúmulo do campeonato e validação da configuração (5 presentes por lado, sem repetição).
+- Teste de carga com o simulador: rajada de 200+ presentes sem travar a tela.
+- Atualizar o README com o guia de "como criar um novo jogo" usando este módulo como exemplo.
+
+## 8. REGRAS DE TRANSPARÊNCIA
+- Valores dos presentes, multiplicadores e regras de prorrogação sempre visíveis na tela.
+- Sem textos que prometam retorno ou pressionem de forma enganosa.
+- Avisar no README que a leitura da live usa biblioteca não oficial e pode quebrar.
+
+## 9. MARCOS (parar e me mostrar ao fim de cada um)
+1. Módulo + registro no painel + ConfigForm com validação e presets
+2. Reducer com todas as regras e testes
+3. Tela do jogo básica: barra, feed, faixa de participação, animações pequena/média/épica
+4. Mecânicas de tensão: dobro final, prorrogação, virada, narrador, combo, intervalo e campeonato
+5. Participação sem presente (likes/comentários), metas, eventos surpresa e power-ups
+6. Tela final, hall da fama, métricas e controles do painel
+7. Simulador com cenários, teste de carga, ajustes de performance e README
+
+## 10. CRITÉRIOS DE ACEITE
+- Criar uma partida pelo painel, rodar com o simulador e ver todas as mecânicas funcionando.
+- Recarregar a tela do jogo no meio da partida sem perder estado.
+- 60 fps com rajada de presentes.
+- Adicionar um jogo novo fictício exige apenas criar uma pasta e uma linha no registry.
