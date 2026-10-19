@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "LiveArena"
+description = "Painel em português para configurar e acompanhar jogos interativos em transmissões ao vivo. Esta primeira etapa oferece acesso de administrador e a estrutura inicial do produto."
+version = "1.0.0"
+id = "artifacts/livearena"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21821
+
+[services.development]
+run = "pnpm --filter @workspace/livearena run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/livearena", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/livearena/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21821"
+BASE_PATH = "/"

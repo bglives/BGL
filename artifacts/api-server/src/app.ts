@@ -6,6 +6,10 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// The generated web client treats 304 as an error; API responses are dynamic
+// and should not be conditionally cached.
+app.set("etag", false);
+
 app.use(
   pinoHttp({
     logger,

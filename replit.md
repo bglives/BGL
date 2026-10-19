@@ -1,6 +1,6 @@
-# [Project name]
+# LiveArena
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+LiveArena is a Portuguese-language control panel for configuring interactive games that respond to TikTok LIVE events.
 
 ## Run & Operate
 
@@ -22,23 +22,28 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/livearena` — browser-based admin panel
+- `artifacts/api-server` — shared Express API
+- `lib/api-spec/openapi.yaml` — API contract and code generation source
+- `lib/db/src/schema` — PostgreSQL data model (Drizzle)
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The LiveArena panel uses the existing Express and PostgreSQL/Drizzle workspace stack.
+- Admin access is a single environment-configured account with a signed, HttpOnly session cookie.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The first milestone establishes the admin sign-in, panel shell, and persistent data model. The later milestones add the game registry, match management, TikTok LIVE provider, simulator, and Batalha de Votos.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep all interface text in Brazilian Portuguese.
+- Stop and show the result at the end of each implementation milestone.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After changing `lib/api-spec/openapi.yaml`, run API codegen before using the generated hooks or schemas.
 
 ## Pointers
 

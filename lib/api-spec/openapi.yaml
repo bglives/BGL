@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Admin session operations
+  - name: dashboard
+    description: Panel overview
 paths:
   /healthz:
     get:
@@ -24,7 +28,92 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/session:
+    get:
+      operationId: getAuthSession
+      tags: [auth]
+      summary: Get the current admin session
+      responses:
+        "200":
+          description: Current authentication state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+  /auth/login:
+    post:
+      operationId: loginAdmin
+      tags: [auth]
+      summary: Start an admin session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Admin session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Admin login is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /auth/logout:
+    post:
+      operationId: logoutAdmin
+      tags: [auth]
+      summary: End the admin session
+      responses:
+        "200":
+          description: Admin session ended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get the panel overview
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Current panel totals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: livearena_session
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +122,43 @@ components:
           type: string
       required:
         - status
+    AuthSession:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        username:
+          type: ["string", "null"]
+      required: [authenticated, username]
+    AdminLoginInput:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          minLength: 1
+          maxLength: 1024
+      required: [username, password]
+    DashboardSummary:
+      type: object
+      properties:
+        totalMatches:
+          type: integer
+          minimum: 0
+        activeMatches:
+          type: integer
+          minimum: 0
+        finishedMatches:
+          type: integer
+          minimum: 0
+      required: [totalMatches, activeMatches, finishedMatches]
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
 
