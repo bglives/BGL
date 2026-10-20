@@ -1344,3 +1344,387 @@ select.config-input { appearance: none; padding-right: 30px; }
   filter: brightness(1.15);
 }
 
+/* ========================================================
+   RESPONSIVO MOBILE — ELECTION ARENA & GAME SCREEN
+   ======================================================== */
+
+/* Tablets e telas médias */
+@media (max-width: 900px) {
+  .election-stage {
+    flex-direction: column;
+    gap: 12px;
+    padding: 6px 0;
+  }
+
+  .candidate-podium {
+    max-width: 100%;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .candidate-photo-frame {
+    width: 100px;
+    height: 120px;
+  }
+
+  .election-urna {
+    width: 100%;
+    max-width: 100%;
+    order: -1;
+  }
+
+  .election-vote-feed {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .election-sim-panel {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+  }
+
+  .election-controls-bar {
+    position: relative;
+    top: auto;
+    right: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+}
+
+/* Celulares */
+@media (max-width: 640px) {
+  .election-arena {
+    padding: 8px 10px;
+    min-height: 100dvh;
+  }
+
+  .election-header {
+    padding: 6px 10px;
+    gap: 6px;
+    border-radius: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .election-title {
+    font-size: 12px;
+    text-align: center;
+    width: 100%;
+    order: -1;
+  }
+
+  .election-live-badge {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+
+  .election-round-indicator {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+
+  .plantao-banner {
+    font-size: 11px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+
+  /* Palco: empilhar verticalmente */
+  .election-stage {
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 0;
+  }
+
+  /* Candidatos lado a lado compactos */
+  .candidate-podium {
+    max-width: 100%;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .candidate-podium.is-leader {
+    transform: scale(1.02);
+  }
+
+  .leader-crown {
+    font-size: 9px;
+    padding: 3px 8px;
+    margin-bottom: 4px;
+  }
+
+  .candidate-photo-frame {
+    width: 80px;
+    height: 95px;
+    flex-shrink: 0;
+  }
+
+  .candidate-photo {
+    border-radius: 10px;
+  }
+
+  .podium-base {
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-top: 0;
+    flex: 1;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .candidate-badge-num {
+    font-size: 11px;
+    padding: 2px 8px;
+    top: -10px;
+  }
+
+  .candidate-name {
+    font-size: 14px;
+  }
+
+  .candidate-live-votes .vote-counter {
+    font-size: 20px;
+  }
+
+  .candidate-live-votes small {
+    font-size: 9px;
+  }
+
+  /* Urna compacta */
+  .election-urna {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    border-radius: 14px;
+    border-width: 2px;
+    order: -1;
+  }
+
+  .urna-digital-display {
+    padding: 8px;
+    border-radius: 10px;
+    gap: 6px;
+  }
+
+  .display-score {
+    font-size: 20px;
+  }
+
+  .display-pct {
+    font-size: 11px;
+  }
+
+  .display-cand-label {
+    font-size: 9px;
+    max-width: 70px;
+  }
+
+  .urna-meter-bar {
+    height: 8px;
+  }
+
+  .urna-confirm-panel {
+    padding: 5px 10px;
+  }
+
+  .urna-seal {
+    font-size: 9px;
+  }
+
+  /* Feed de votos */
+  .election-vote-feed {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin-top: 6px;
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .feed-header {
+    font-size: 8px;
+  }
+
+  .feed-item {
+    font-size: 8px;
+  }
+
+  /* Como votar */
+  .election-how-to-vote {
+    padding: 6px 10px;
+    border-radius: 10px;
+  }
+
+  .vote-instructions-header {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .instructions-columns {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .gift-vote-chip {
+    padding: 2px 6px;
+    font-size: 9px;
+  }
+
+  .vote-call {
+    font-size: 9px;
+  }
+
+  /* Controles */
+  .election-controls-bar {
+    position: relative;
+    top: auto;
+    right: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 4px;
+  }
+
+  .ctrl-btn {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  /* Sim Panel */
+  .election-sim-panel {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    padding: 8px;
+    border-radius: 10px;
+  }
+
+  .sim-panel-title {
+    font-size: 10px;
+  }
+
+  .sim-btn {
+    font-size: 9px;
+    padding: 5px 6px;
+  }
+
+  /* Winner Modal */
+  .winner-card {
+    padding: 24px 20px;
+    border-radius: 20px;
+    max-width: 340px;
+  }
+
+  .winner-proclamation {
+    font-size: 20px;
+    margin: 14px 0;
+  }
+
+  .winner-avatar-spotlight {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 18px;
+  }
+
+  .winner-laurel {
+    font-size: 34px;
+    top: -18px;
+    right: -6px;
+  }
+
+  .winner-stats-grid {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .winner-stat-box {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .stat-val {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-pct {
+    font-size: 11px;
+  }
+
+  .winner-btn-restart {
+    padding: 12px 20px;
+    font-size: 12px;
+    border-radius: 12px;
+  }
+
+  .winner-ribbon {
+    font-size: 10px;
+  }
+
+  /* Slogan watermark — esconder em telas muito pequenas */
+  .fixed.bottom-3 {
+    display: none !important;
+  }
+}
+
+/* Telas muito pequenas (ex: iPhone SE) */
+@media (max-width: 380px) {
+  .election-header {
+    padding: 5px 8px;
+  }
+
+  .election-title {
+    font-size: 10px;
+  }
+
+  .candidate-photo-frame {
+    width: 60px;
+    height: 75px;
+  }
+
+  .candidate-name {
+    font-size: 12px;
+  }
+
+  .candidate-live-votes .vote-counter {
+    font-size: 17px;
+  }
+
+  .display-score {
+    font-size: 17px;
+  }
+
+  .plantao-banner {
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+
+  .winner-card {
+    padding: 18px 14px;
+    max-width: 290px;
+  }
+
+  .winner-proclamation {
+    font-size: 17px;
+  }
+
+  .winner-avatar-spotlight {
+    width: 80px;
+    height: 80px;
+  }
+}
+

@@ -179,7 +179,7 @@ function Dashboard() {
   const queryClient = useQueryClient();
   const session = useGetAuthSession();
   const summary = useGetDashboardSummary({
-    query: { retry: false },
+    query: { queryKey: getGetDashboardSummaryQueryKey(), retry: false },
   });
   const logout = useLogoutAdmin();
 
@@ -304,6 +304,15 @@ function GameShell({ children, pageTitle, active }: { children: ReactNode; pageT
   const session = useGetAuthSession();
   const logout = useLogoutAdmin();
 
+  const signOut = () => {
+    logout.mutate(undefined, {
+      onSuccess: (authSession) => {
+        queryClient.setQueryData(getGetAuthSessionQueryKey(), authSession);
+        queryClient.removeQueries({ queryKey: getGetDashboardSummaryQueryKey() });
+        setLocation('/login');
+      },
+    });
+  };
   const username = session.data?.username || 'Administrador';
   return <div className="app-shell">
     <aside className="sidebar">
