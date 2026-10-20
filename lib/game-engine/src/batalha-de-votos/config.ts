@@ -1,0 +1,30 @@
+export type BatalhaReducerConfig = {
+  candidateA: { gifts: { id: string; votes: number }[] };
+  candidateB: { gifts: { id: string; votes: number }[] };
+  mode: 'single' | 'best-of-3' | 'best-of-5';
+  roundMinutes: '5' | '10' | '30';
+  intermissionSeconds: number;
+  tieRule: 'draw' | 'overtime';
+  doubleLastMinute: boolean;
+  leadChangeOvertime: boolean;
+  overtimeSeconds: number;
+  maxOvertimes: number;
+  likesEnergy: boolean;
+  energyBonusThreshold: number;
+  energyBonusPoints: number;
+  energyBonusCap: number;
+  chatCommands: boolean;
+  collectiveGoals: {
+    side: 'candidateA' | 'candidateB' | 'both';
+    points: number;
+    message: string;
+  }[];
+  surpriseEvents: boolean;
+  powerUps: boolean;
+  powerUpEffect: 'shield' | 'freeze';
+  powerUpGiftA?: string;
+  powerUpGiftB?: string;
+  smallThreshold: number;
+  mediumThreshold: number;
+  epicThreshold: number;
+};

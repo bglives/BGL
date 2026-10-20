@@ -1,1 +1,1 @@
-- [LiveArena milestone workflow](livearena-milestones.md) — complete only the current milestone, show it, and wait before starting the next.
+- [LiveArena milestones and scoring](livearena-milestones.md) — stop after each milestone and keep user-approved reducer defaults consistent.
