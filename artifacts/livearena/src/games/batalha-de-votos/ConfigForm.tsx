@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { ArrowLeft, Check, ChevronDown, ImagePlus, Info, Plus, Sparkles, Trash2, Volume2 } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { configSchema, type BatalhaDeVotosConfig } from './config-schema';
 
 const defaultGift = () => ({ id: '', name: '', imageUrl: '', costCoins: 0, votes: 1 });
@@ -136,6 +136,9 @@ export function ConfigForm() {
       setVideoPreview(nextPreview);
     }
   };
+  const [, setLocation] = useLocation();
+  const [isSaving, setIsSaving] = useState(false);
+
   const onAvatarFile = (side: 'candidateA' | 'candidateB', file?: File) => {
     const oldPreview = side === 'candidateA' ? avatarPreviewA : avatarPreviewB;
     if (oldPreview) URL.revokeObjectURL(oldPreview);
@@ -143,8 +146,61 @@ export function ConfigForm() {
     const nextPreview = file ? URL.createObjectURL(file) : '';
     if (side === 'candidateA') setAvatarPreviewA(nextPreview);
     else setAvatarPreviewB(nextPreview);
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        setValue(`${side}.avatarDataUrl`, dataUrl, { shouldDirty: true });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setValue(`${side}.avatarDataUrl`, undefined, { shouldDirty: true });
+    }
   };
-  const onSubmit = () => setSubmitted(true);
+
+  const onSubmit = async (values: BatalhaDeVotosConfig) => {
+    setSubmitted(true);
+    setIsSaving(true);
+    try {
+      const payloadConfig = {
+        ...values,
+        candidateA: {
+          ...values.candidateA,
+          avatar: undefined,
+        },
+        candidateB: {
+          ...values.candidateB,
+          avatar: undefined,
+        },
+        backgroundImage: undefined,
+        backgroundVideo: undefined,
+      };
+
+      const res = await fetch('/api/matches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: values.title || 'Eleição 2026',
+          config: payloadConfig,
+          tiktokUsername: 'simulador',
+          isSimulation: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (data?.match?.id) {
+        setLocation(`/play/${data.match.id}`);
+      } else {
+        setLocation('/play');
+      }
+    } catch {
+      setLocation('/play');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return <form className="config-form" onSubmit={handleSubmit(onSubmit)} onChange={() => setSubmitted(false)} noValidate data-testid="form-batalha-config">
     <Section number="01" title="Identidade da partida" description="Dê contexto à disputa e escolha como ela será exibida." testId="section-identity">
       <label className="config-field"><span>Título da partida <em>Opcional</em></span><input className="config-input" placeholder="Ex.: Duelo da comunidade" {...register('title')} data-testid="input-match-title" /><FieldError>{errors.title?.message}</FieldError></label>
@@ -257,11 +313,11 @@ export function ConfigForm() {
 
     <div className="config-footer">
       <Link href="/games" className="btn-quiet config-back" data-testid="link-back-library"><ArrowLeft size={14} /> Biblioteca</Link>
-      <button type="button" className="preview-button" onClick={() => setShowPreviewNotice(true)} data-testid="button-preview-game">Pré-visualizar</button>
-      <button type="submit" className="config-submit" data-testid="button-validate-config">Validar configuração <Check size={16} /></button>
+      <Link href="/play" className="preview-button inline-flex items-center justify-center gap-1" data-testid="button-preview-game">Pré-visualizar Arena</Link>
+      <button type="submit" className="config-submit" disabled={isSaving} data-testid="button-validate-config">
+        {isSaving ? 'Salvando...' : 'Salvar e Abrir Arena'} <Check size={16} />
+      </button>
     </div>
-    {showPreviewNotice && <div className="preview-notice" role="status" aria-live="polite" data-testid="status-preview-unavailable"><Info size={16} /><span>A prévia interativa do jogo estará disponível em um próximo marco. Nenhum simulador foi iniciado.</span><button type="button" aria-label="Fechar aviso de prévia" onClick={() => setShowPreviewNotice(false)} data-testid="button-dismiss-preview-notice">×</button></div>}
-    {submitted && <div className="config-ready" role="status" data-testid="status-config-ready"><Check size={19} /><div><strong>Configuração pronta para o próximo marco.</strong><span>Foi validada localmente; nenhuma partida foi criada ou salva.</span></div><button type="button" onClick={() => setSubmitted(false)} aria-label="Fechar confirmação" data-testid="button-dismiss-ready">×</button></div>}
   </form>;
 }
 

@@ -20,7 +20,8 @@ const giftSchema = z.object({
 const candidateSchema = z.object({
   name: z.string().trim().min(1, 'Informe o nome do candidato.'),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Escolha uma cor válida.'),
-  avatar: imageFile,
+  avatar: z.union([imageFile, z.string()]).optional(),
+  avatarDataUrl: z.string().optional(),
   gifts: z.array(giftSchema).length(5, 'Cada candidato deve ter exatamente cinco presentes.'),
 });
 
@@ -28,7 +29,8 @@ export const configSchema = z.object({
   title: z.string().trim().max(80, 'Use até 80 caracteres.').optional(),
   candidateA: candidateSchema,
   candidateB: candidateSchema,
-  backgroundImage: imageFile,
+  backgroundImage: z.union([imageFile, z.string()]).optional(),
+  backgroundDataUrl: z.string().optional(),
   backgroundVideo: videoFile,
   format: z.enum(['vertical', 'horizontal']),
   mode: z.enum(['single', 'best-of-3', 'best-of-5']),

@@ -34,6 +34,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import { PlayGame } from '@/pages/play';
 import { availableGames, findAvailableGame, futureGames } from '@/games/registry';
 
 const queryClient = new QueryClient();
@@ -42,7 +43,12 @@ function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3" data-testid="brand-livearena">
       <div className="brand-mark"><Swords size={18} strokeWidth={2.2} /></div>
-      {!compact && <div className="brand-word">live<span>arena</span></div>}
+      {!compact && (
+        <div className="flex flex-col leading-tight">
+          <div className="brand-word">B.G.L <span>LIVE</span></div>
+          <span className="text-[9px] tracking-wider font-bold text-[#828998] uppercase">Brazas Gaming Live</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -66,7 +72,7 @@ function QueryError({ onRetry, title = 'Não foi possível carregar o painel' }:
       <section className="error-card">
         <div className="mb-4 text-rose-300"><CircleHelp size={25} /></div>
         <h2>{title}</h2>
-        <p>Houve uma falha ao conectar com o LiveArena. Tente novamente em instantes.</p>
+        <p>Houve uma falha ao conectar com o B.G.L Brazas Gaming Live. Tente novamente em instantes.</p>
         <button className="btn-quiet inline-flex items-center gap-2" onClick={onRetry} data-testid="button-retry">
           <RotateCw size={13} /> Tentar novamente
         </button>
@@ -319,7 +325,7 @@ function Dashboard() {
               </div>
             </article>
           </section>
-          <div className="footer-note">LIVEARENA · CONTROLE DA SUA ARENA</div>
+          <div className="footer-note">B.G.L BRAZAS GAMING LIVE · CONTROLE DA SUA ARENA</div>
         </main>
       </div>
     </div>
@@ -389,7 +395,7 @@ function GamesLibrary() {
         const manifest = game.plugin.manifest;
         return <article className="featured-game" key={game.id} data-testid={`card-game-${game.id}`}>
           <div className="featured-art" style={{ background: manifest.thumbnail }}><span className="featured-ring" /><div className="featured-emblem"><Swords size={38} /></div><span className="featured-tag">{manifest.category.toLocaleUpperCase('pt-BR')}</span></div>
-          <div className="featured-copy"><span className="game-version">LIVEARENA ORIGINAL · V{manifest.version}</span><h2>{manifest.name}</h2><p>{manifest.description}</p><div className="game-meta">{manifest.formats.map((format) => <span key={format}>{format}</span>)}<span>5 presentes por lado</span></div>
+          <div className="featured-copy"><span className="game-version">B.G.L ORIGINAL · V{manifest.version}</span><h2>{manifest.name}</h2><p>{manifest.description}</p><div className="game-meta">{manifest.formats.map((format) => <span key={format}>{format}</span>)}<span>5 presentes por lado</span></div>
             <Link href={`/games/${game.id}/configure`} className="game-create-button" data-testid={`button-create-match-${game.id}`}>Criar partida <ArrowRight size={15} /></Link>
           </div>
           <div className="feature-index">{String(index + 1).padStart(2, '0')}</div>
@@ -402,7 +408,7 @@ function GamesLibrary() {
         <div className="future-game-art"><span>{String(index + 2).padStart(2, '0')}</span><i /></div><div className="future-card-copy"><span className="future-label">EM BREVE</span><h3>{game.name}</h3><p>{game.description}</p><span className="future-category">{game.category}</span></div>
       </article>)}
     </section>
-    <div className="footer-note">LIVEARENA · BIBLIOTECA DE JOGOS</div>
+    <div className="footer-note">B.G.L BRAZAS GAMING LIVE · BIBLIOTECA DE JOGOS</div>
   </GameShell>;
 }
 
@@ -431,6 +437,8 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/games" component={GamesLibrary} />
         <Route path="/games/:gameId/configure" component={ConfigureGame} />
+        <Route path="/play/:matchId" component={PlayGame} />
+        <Route path="/play" component={PlayGame} />
         <Route path="/" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>

@@ -1,25 +1,20 @@
+import http from "node:http";
 import app from "./app";
 import { logger } from "./lib/logger";
+import { setupWebSocketServer } from "./websocket";
 
-const rawPort = process.env["PORT"];
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
-
+const rawPort = process.env["PORT"] || "5000";
 const port = Number(rawPort);
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
-  }
+const server = http.createServer(app);
 
-  logger.info({ port }, "Server listening");
+// Attach WebSocket server for real-time live events and state synchronization
+setupWebSocketServer(server);
+
+server.listen(port, "0.0.0.0", () => {
+  logger.info({ port }, `B.G.L Brazas Gaming Live API & WebSocket server escutando em 0.0.0.0:${port}`);
 });
