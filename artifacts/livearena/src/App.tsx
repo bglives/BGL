@@ -206,8 +206,8 @@ function Dashboard() {
         <nav aria-label="Navegação principal">
           <NavItem icon={BarChart3} active>Visão geral</NavItem>
           <NavItem icon={Gamepad2} href="/games">Biblioteca de jogos</NavItem>
-          <NavItem icon={Swords}>Partidas</NavItem>
-          <NavItem icon={Radio}>Conexão TikTok LIVE</NavItem>
+          <NavItem icon={Swords} href="/play">Arena ao Vivo</NavItem>
+          <NavItem icon={Radio} href="/games/batalha-de-votos/configure">Conexão TikTok LIVE</NavItem>
         </nav>
         <div className="sidebar-bottom">
           <div className="flex justify-center mb-2.5">
@@ -321,8 +321,8 @@ function GameShell({ children, pageTitle, active }: { children: ReactNode; pageT
       <nav aria-label="Navegação principal">
         <NavItem icon={BarChart3} href="/">Visão geral</NavItem>
         <NavItem icon={Gamepad2} href="/games" active={active === 'games' || active === 'configure'}>Biblioteca de jogos</NavItem>
-        <NavItem icon={Swords}>Partidas</NavItem>
-        <NavItem icon={Radio}>Conexão TikTok LIVE</NavItem>
+        <NavItem icon={Swords} href="/play">Arena ao Vivo</NavItem>
+        <NavItem icon={Radio} href="/games/batalha-de-votos/configure">Conexão TikTok LIVE</NavItem>
       </nav>
       <div className="sidebar-bottom">
         <div className="flex justify-center mb-2.5">
@@ -360,30 +360,40 @@ function GameShell({ children, pageTitle, active }: { children: ReactNode; pageT
 
 function GamesLibrary() {
   return <GameShell pageTitle="Biblioteca de jogos" active="games">
-    <div className="eyebrow">ESCOLHA O FORMATO DA SUA LIVE</div>
+    <div className="eyebrow">MODO OFICIAL DISPONÍVEL</div>
     <div className="library-heading">
-      <div><h1 className="page-title" data-testid="heading-game-library">Biblioteca de jogos</h1><p className="page-subtitle">Regras claras para transformar a conversa em participação.</p></div>
-      <span className="library-count" data-testid="text-library-count">{String(availableGames.length).padStart(2, '0')} DISPONÍVEL{availableGames.length === 1 ? '' : 'IS'}</span>
+      <div><h1 className="page-title" data-testid="heading-game-library">Biblioteca de Jogos BGL</h1><p className="page-subtitle">Pronto para rodar na sua Live do TikTok ou no modo simulado para teste.</p></div>
+      <span className="library-count" data-testid="text-library-count">PRONTO PARA USAR</span>
     </div>
     <section className="available-games" aria-label="Jogos disponíveis">
       {availableGames.map((game, index) => {
         const manifest = game.plugin.manifest;
         return <article className="featured-game" key={game.id} data-testid={`card-game-${game.id}`}>
-          <div className="featured-art" style={{ background: manifest.thumbnail }}><span className="featured-ring" /><div className="featured-emblem"><Swords size={38} /></div><span className="featured-tag">{manifest.category.toLocaleUpperCase('pt-BR')}</span></div>
-          <div className="featured-copy"><span className="game-version">BGL ORIGINAL · V{manifest.version}</span><h2>{manifest.name}</h2><p>{manifest.description}</p><div className="game-meta">{manifest.formats.map((format) => <span key={format}>{format}</span>)}<span>5 presentes por lado</span></div>
-            <Link href={`/games/${game.id}/configure`} className="game-create-button" data-testid={`button-create-match-${game.id}`}>Criar partida <ArrowRight size={15} /></Link>
+          <div className="featured-art" style={{ background: manifest.thumbnail }}><span className="featured-ring" /><div className="featured-emblem"><Swords size={38} /></div><span className="featured-tag">ELEIÇÃO AO VIVO</span></div>
+          <div className="featured-copy">
+            <span className="game-version">BGL ORIGINAL · VERSÃO 1.0 COMPLETA</span>
+            <h2>{manifest.name}</h2>
+            <p>Dois candidatos, urna eletrônica com apuração em tempo real, votação por presentes do TikTok ou simulador integrado.</p>
+            <div className="game-meta">
+              <span>Urna Eletrônica</span>
+              <span>TikTok LIVE</span>
+              <span>Modo Simulação</span>
+              <span>Votos em Dobro</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+              <Link href="/play" className="game-create-button !bg-[#00d2ff] !text-[#040914] font-black shadow-[0_0_20px_rgba(0,210,255,0.4)]" data-testid="button-play-direct">
+                ▶ Jogar Agora (Arena Pronta)
+              </Link>
+              <Link href={`/games/${game.id}/configure`} className="btn-quiet !py-2.5 !px-4 text-xs font-bold inline-flex items-center gap-1.5" data-testid={`button-create-match-${game.id}`}>
+                ⚙ Personalizar Candidatos & Presentes
+              </Link>
+            </div>
           </div>
           <div className="feature-index">{String(index + 1).padStart(2, '0')}</div>
         </article>;
       })}
     </section>
-    <div className="library-subhead"><div><span className="eyebrow">EM DESENVOLVIMENTO</span><h2>Mais jeitos de jogar</h2></div><p>Novos formatos serão adicionados à biblioteca.</p></div>
-    <section className="future-games" aria-label="Próximos jogos">
-      {futureGames.map((game, index) => <article className="future-game-card" key={game.id} style={{ '--game-paint': game.thumbnail } as CSSProperties} data-testid={`card-game-${game.id}`}>
-        <div className="future-game-art"><span>{String(index + 2).padStart(2, '0')}</span><i /></div><div className="future-card-copy"><span className="future-label">EM BREVE</span><h3>{game.name}</h3><p>{game.description}</p><span className="future-category">{game.category}</span></div>
-      </article>)}
-    </section>
-    <div className="footer-note">BGL · BIBLIOTECA DE JOGOS</div>
+    <div className="footer-note">BGL · SISTEMA OPERACIONAL DA SUA LIVE</div>
   </GameShell>;
 }
 

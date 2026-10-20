@@ -5,11 +5,26 @@ import { ArrowLeft, Check, ChevronDown, ImagePlus, Info, Plus, Sparkles, Trash2,
 import { Link, useLocation } from 'wouter';
 import { configSchema, type BatalhaDeVotosConfig } from './config-schema';
 
-const defaultGift = () => ({ id: '', name: '', imageUrl: '', costCoins: 0, votes: 1 });
+const defaultGiftsA = [
+  { id: 'gift-rose', name: 'Rosa', imageUrl: '', costCoins: 1, votes: 1 },
+  { id: 'gift-ice-cream', name: 'Sorvete', imageUrl: '', costCoins: 2, votes: 2 },
+  { id: 'gift-donut', name: 'Donut', imageUrl: '', costCoins: 5, votes: 5 },
+  { id: 'gift-perfume', name: 'Perfume', imageUrl: '', costCoins: 10, votes: 10 },
+  { id: 'gift-lion', name: 'Leão Eleitoral', imageUrl: '', costCoins: 50, votes: 50 },
+];
+
+const defaultGiftsB = [
+  { id: 'gift-heart', name: 'Coração', imageUrl: '', costCoins: 1, votes: 1 },
+  { id: 'gift-coffee', name: 'Café', imageUrl: '', costCoins: 2, votes: 2 },
+  { id: 'gift-crown', name: 'Coroa', imageUrl: '', costCoins: 5, votes: 5 },
+  { id: 'gift-rocket', name: 'Foguete', imageUrl: '', costCoins: 10, votes: 10 },
+  { id: 'gift-trophy', name: 'Troféu Oficial', imageUrl: '', costCoins: 50, votes: 50 },
+];
+
 const defaults: BatalhaDeVotosConfig = {
-  title: '',
-  candidateA: { name: '', color: '#62e6b0', avatar: undefined, gifts: Array.from({ length: 5 }, defaultGift) },
-  candidateB: { name: '', color: '#ff8b9f', avatar: undefined, gifts: Array.from({ length: 5 }, defaultGift) },
+  title: 'Eleição 2026 · Ao Vivo',
+  candidateA: { name: 'Candidato 10', color: '#10b981', avatar: undefined, gifts: defaultGiftsA },
+  candidateB: { name: 'Candidato 20', color: '#ef4444', avatar: undefined, gifts: defaultGiftsB },
   backgroundImage: undefined,
   backgroundVideo: undefined,
   format: 'vertical',
@@ -22,11 +37,11 @@ const defaults: BatalhaDeVotosConfig = {
   leadChangeOvertime: true,
   overtimeSeconds: 20,
   maxOvertimes: 2,
-  likesEnergy: false,
+  likesEnergy: true,
   energyBonusThreshold: 100,
   energyBonusPoints: 5,
   energyBonusCap: 20,
-  chatCommands: false,
+  chatCommands: true,
   collectiveGoals: [],
   surpriseEvents: false,
   powerUps: false,
@@ -138,6 +153,7 @@ export function ConfigForm() {
   };
   const [, setLocation] = useLocation();
   const [isSaving, setIsSaving] = useState(false);
+  const [tiktokUser, setTiktokUser] = useState('');
 
   const onAvatarFile = (side: 'candidateA' | 'candidateB', file?: File) => {
     const oldPreview = side === 'candidateA' ? avatarPreviewA : avatarPreviewB;
@@ -183,8 +199,8 @@ export function ConfigForm() {
         body: JSON.stringify({
           title: values.title || 'Eleição 2026',
           config: payloadConfig,
-          tiktokUsername: 'simulador',
-          isSimulation: true,
+          tiktokUsername: tiktokUser.trim() || 'simulador',
+          isSimulation: !tiktokUser.trim(),
         }),
       });
 
@@ -202,8 +218,23 @@ export function ConfigForm() {
   };
 
   return <form className="config-form" onSubmit={handleSubmit(onSubmit)} onChange={() => setSubmitted(false)} noValidate data-testid="form-batalha-config">
-    <Section number="01" title="Identidade da partida" description="Dê contexto à disputa e escolha como ela será exibida." testId="section-identity">
-      <label className="config-field"><span>Título da partida <em>Opcional</em></span><input className="config-input" placeholder="Ex.: Duelo da comunidade" {...register('title')} data-testid="input-match-title" /><FieldError>{errors.title?.message}</FieldError></label>
+    <Section number="01" title="Identidade da partida & Conexão TikTok" description="Dê contexto à disputa e conecte sua live diretamente." testId="section-identity">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
+        <label className="config-field">
+          <span>Título da partida</span>
+          <input className="config-input" placeholder="Ex.: Eleição 2026 · Ao Vivo" {...register('title')} data-testid="input-match-title" />
+          <FieldError>{errors.title?.message}</FieldError>
+        </label>
+        <label className="config-field">
+          <span>Seu @ do TikTok LIVE <em className="text-cyan-400 font-bold">(opcional para conectar direto)</em></span>
+          <input
+            className="config-input border-cyan-500/50 focus:border-cyan-400"
+            placeholder="Ex.: seunome_tiktok"
+            value={tiktokUser}
+            onChange={(e) => setTiktokUser(e.target.value)}
+          />
+        </label>
+      </div>
       <div className="choice-grid">
         <label className="config-field"><span>Formato da tela</span><select className="config-input" {...register('format')} data-testid="select-format"><option value="vertical">Vertical · 9:16</option><option value="horizontal">Horizontal · 16:9</option></select><ChevronDown className="select-chevron" size={14} /></label>
         <label className="config-field"><span>Modo da partida</span><select className="config-input" {...register('mode')} data-testid="select-mode"><option value="single">Partida única</option><option value="best-of-3">Campeonato · melhor de 3</option><option value="best-of-5">Campeonato · melhor de 5</option></select><ChevronDown className="select-chevron" size={14} /></label>
