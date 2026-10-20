@@ -575,6 +575,15 @@ export function GameScreen({
           </div>
         </div>
       )}
+
+      {/* 6. SLOGAN FIXO NO CANTO INFERIOR */}
+      <div className="fixed bottom-3 right-3 z-40 pointer-events-none select-none flex items-center gap-2">
+        <img
+          src="/brazas-slogan.png"
+          alt="Brazas Gaming Lives"
+          className="h-11 w-auto object-contain opacity-90 drop-shadow-[0_0_14px_rgba(0,180,216,0.7)]"
+        />
+      </div>
     </main>
   );
 }

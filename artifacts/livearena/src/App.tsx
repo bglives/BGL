@@ -210,6 +210,13 @@ function Dashboard() {
           <NavItem icon={Radio}>Conexão TikTok LIVE</NavItem>
         </nav>
         <div className="sidebar-bottom">
+          <div className="flex justify-center mb-2.5">
+            <img
+              src="/brazas-slogan.png"
+              alt="Brazas Gaming Lives"
+              className="h-8 w-auto object-contain opacity-85 drop-shadow-[0_0_10px_rgba(0,180,216,0.5)]"
+            />
+          </div>
           <div className="live-status">
             <div className="flex items-center gap-2"><span className="live-pulse" /><span className="text-[10px] font-bold text-[#e7e7df]">Central pronta</span></div>
             <p className="mb-0 mt-2 text-[9px] leading-relaxed text-[#828998]">Sua próxima transmissão começa com uma boa preparação.</p>
@@ -279,6 +286,14 @@ function Dashboard() {
           <div className="footer-note">BGL · CONTROLE DA SUA ARENA</div>
         </main>
       </div>
+      {/* Slogan fixo no canto inferior */}
+      <div className="fixed bottom-3 right-4 z-40 pointer-events-none select-none hidden sm:block">
+        <img
+          src="/brazas-slogan.png"
+          alt="Brazas Gaming Lives"
+          className="h-10 w-auto object-contain opacity-85 drop-shadow-[0_0_12px_rgba(0,180,216,0.65)]"
+        />
+      </div>
     </div>
   );
 }
@@ -301,6 +316,13 @@ function GameShell({ children, pageTitle, active }: { children: ReactNode; pageT
         <NavItem icon={Radio}>Conexão TikTok LIVE</NavItem>
       </nav>
       <div className="sidebar-bottom">
+        <div className="flex justify-center mb-2.5">
+          <img
+            src="/brazas-slogan.png"
+            alt="Brazas Gaming Lives"
+            className="h-8 w-auto object-contain opacity-85 drop-shadow-[0_0_10px_rgba(0,180,216,0.5)]"
+          />
+        </div>
         <div className="live-status"><div className="flex items-center gap-2"><span className="live-pulse" /><span className="text-[10px] font-bold text-[#e7e7df]">Central pronta</span></div><p className="mb-0 mt-2 text-[9px] leading-relaxed text-[#828998]">Prepare as regras antes de iniciar uma partida.</p></div>
         <button onClick={signOut} disabled={logout.isPending} className="nav-item mt-3 w-full border-0 bg-transparent text-left" data-testid="button-logout"><LogOut size={16} /><span>{logout.isPending ? 'Saindo…' : 'Sair da conta'}</span></button>
       </div>
@@ -315,6 +337,14 @@ function GameShell({ children, pageTitle, active }: { children: ReactNode; pageT
         {logout.isError && <p className="form-error mb-4" role="alert" data-testid="status-logout-error">Não foi possível encerrar a sessão. Tente novamente.</p>}
         {children}
       </main>
+    </div>
+    {/* Slogan fixo no canto inferior */}
+    <div className="fixed bottom-3 right-4 z-40 pointer-events-none select-none hidden sm:block">
+      <img
+        src="/brazas-slogan.png"
+        alt="Brazas Gaming Lives"
+        className="h-10 w-auto object-contain opacity-85 drop-shadow-[0_0_12px_rgba(0,180,216,0.65)]"
+      />
     </div>
   </div>;
 }
