@@ -188,10 +188,17 @@ export function GameScreen({
     >
       {/* 1. CABEÇALHO ELEITORAL */}
       <header className="election-header">
-        <div className="election-live-badge">
-          <span className="live-dot" />
-          <Radio size={14} className="animate-pulse" />
-          <span>AO VIVO · APURAÇÃO OFICIAL</span>
+        <div className="flex items-center gap-2.5">
+          <img
+            src="/bgl-logo.png"
+            alt="BGL Logo"
+            className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(0,210,255,0.85)]"
+          />
+          <div className="election-live-badge">
+            <span className="live-dot" />
+            <Radio size={14} className="animate-pulse" />
+            <span>AO VIVO · APURAÇÃO OFICIAL</span>
+          </div>
         </div>
         <h1 className="election-title">{title}</h1>
         <div className="election-round-indicator">
@@ -252,8 +259,8 @@ export function GameScreen({
         <div className={`election-urna ${activeUrnaFlash ? `flash-${activeUrnaFlash.toLowerCase()}` : ''}`}>
           <div className="urna-top-bezel">
             <div className="urna-seal">
-              <Award size={18} />
-              <span>URNA ELETRÔNICA · BRASIL</span>
+              <img src="/bgl-logo.png" alt="BGL" className="w-5 h-5 object-contain" />
+              <span>BGL · URNA ELETRÔNICA</span>
             </div>
             <div className="urna-status-led" />
           </div>
@@ -517,8 +524,9 @@ export function GameScreen({
           <div className="winner-backdrop" />
           <div className="winner-card">
             <div className="winner-ribbon">
-              <Trophy size={26} className="text-amber-300 animate-bounce" />
-              <span>RESULTADO OFICIAL DAS URNAS</span>
+              <img src="/bgl-logo.png" alt="BGL" className="w-8 h-8 object-contain drop-shadow-[0_0_12px_#00d2ff]" />
+              <Trophy size={22} className="text-amber-300 animate-bounce" />
+              <span>RESULTADO OFICIAL DAS URNAS · BGL</span>
             </div>
 
             <h2 className="winner-proclamation">

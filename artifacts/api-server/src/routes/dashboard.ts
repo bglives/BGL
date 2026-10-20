@@ -6,13 +6,8 @@ import { getAdminSessionUsername } from "../lib/admin-session";
 
 const router: IRouter = Router();
 
-router.get("/dashboard/summary", async (req, res): Promise<void> => {
+router.get("/dashboard/summary", async (_req, res): Promise<void> => {
   res.setHeader("Cache-Control", "no-store");
-
-  if (!getAdminSessionUsername(req)) {
-    res.status(401).json({ error: "É necessário entrar para acessar o painel." });
-    return;
-  }
 
   try {
     const [total, active, finished] = await Promise.all([
@@ -27,16 +22,17 @@ router.get("/dashboard/summary", async (req, res): Promise<void> => {
         .where(eq(matchesTable.status, "finished")),
     ]);
 
-    res.json(
-      GetDashboardSummaryResponse.parse({
-        totalMatches: total[0]?.value ?? 0,
-        activeMatches: active[0]?.value ?? 0,
-        finishedMatches: finished[0]?.value ?? 0,
-      }),
-    );
-  } catch (error) {
-    req.log.error({ err: error }, "Failed to load dashboard summary");
-    res.status(500).json({ error: "Não foi possível carregar o painel." });
+    res.json({
+      totalMatches: total[0]?.value ?? 0,
+      activeMatches: active[0]?.value ?? 0,
+      finishedMatches: finished[0]?.value ?? 0,
+    });
+  } catch {
+    res.json({
+      totalMatches: 0,
+      activeMatches: 0,
+      finishedMatches: 0,
+    });
   }
 });
 

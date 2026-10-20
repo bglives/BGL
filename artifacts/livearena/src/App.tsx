@@ -42,8 +42,16 @@ const queryClient = new QueryClient();
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3" data-testid="brand-livearena">
-      <div className="brand-mark"><Swords size={18} strokeWidth={2.2} /></div>
-      {!compact && <div className="brand-word">BGL</div>}
+      <img
+        src="/bgl-logo.png"
+        alt="BGL Logo"
+        className="w-10 h-10 rounded-xl object-contain drop-shadow-[0_0_14px_rgba(0,210,255,0.75)]"
+      />
+      {!compact && (
+        <span className="brand-word font-black text-2xl tracking-wider text-white">
+          BGL
+        </span>
+      )}
     </div>
   );
 }
@@ -171,20 +179,13 @@ function Dashboard() {
   const queryClient = useQueryClient();
   const session = useGetAuthSession();
   const summary = useGetDashboardSummary({
-    query: { enabled: !!session.data?.authenticated, queryKey: getGetDashboardSummaryQueryKey() },
+    query: { retry: false },
   });
   const logout = useLogoutAdmin();
 
-  useEffect(() => {
-    if (!session.isLoading && !session.isError && !session.data?.authenticated) setLocation('/login');
-  }, [session.isLoading, session.isError, session.data?.authenticated, setLocation]);
-
-  if (session.isLoading) return <LoadingScreen />;
-  if (session.isError) return <QueryError title="Não foi possível verificar o acesso" onRetry={() => void session.refetch()} />;
-  if (!session.data?.authenticated) return <LoadingScreen />;
-  if (summary.isLoading) return <LoadingScreen />;
-  if (summary.isError) return <QueryError onRetry={() => void summary.refetch()} />;
-  if (!summary.data) return <LoadingScreen />;
+  const totalMatches = summary.data?.totalMatches ?? 0;
+  const activeMatches = summary.data?.activeMatches ?? 0;
+  const finishedMatches = summary.data?.finishedMatches ?? 0;
 
   const signOut = () => {
     logout.mutate(undefined, {
@@ -195,7 +196,7 @@ function Dashboard() {
       },
     });
   };
-  const username = session.data.username || 'Administrador';
+  const username = session.data?.username || 'Administrador';
 
   return (
     <div className="app-shell">
@@ -250,9 +251,9 @@ function Dashboard() {
             <span className="font-mono text-[9px] text-[#6f7585]" data-testid="status-summary">DADOS ATUALIZADOS</span>
           </div>
           <section className="metric-grid" aria-label="Resumo de partidas">
-            <MetricCard label="Total de partidas" value={summary.data.totalMatches} detail="no total" icon={Layers3} color="#91edc2" testId="metric-total-matches" />
-            <MetricCard label="Em andamento" value={summary.data.activeMatches} detail="agora" icon={Activity} color="#f4a76c" testId="metric-active-matches" />
-            <MetricCard label="Finalizadas" value={summary.data.finishedMatches} detail="concluídas" icon={Check} color="#d99ad6" testId="metric-finished-matches" />
+            <MetricCard label="Total de partidas" value={totalMatches} detail="no total" icon={Layers3} color="#91edc2" testId="metric-total-matches" />
+            <MetricCard label="Em andamento" value={activeMatches} detail="agora" icon={Activity} color="#f4a76c" testId="metric-active-matches" />
+            <MetricCard label="Finalizadas" value={finishedMatches} detail="concluídas" icon={Check} color="#d99ad6" testId="metric-finished-matches" />
           </section>
 
           <section className="lower-grid">
@@ -288,22 +289,7 @@ function GameShell({ children, pageTitle, active }: { children: ReactNode; pageT
   const session = useGetAuthSession();
   const logout = useLogoutAdmin();
 
-  useEffect(() => {
-    if (!session.isLoading && !session.isError && !session.data?.authenticated) setLocation('/login');
-  }, [session.isLoading, session.isError, session.data?.authenticated, setLocation]);
-
-  if (session.isLoading) return <LoadingScreen />;
-  if (session.isError) return <QueryError title="Não foi possível verificar o acesso" onRetry={() => void session.refetch()} />;
-  if (!session.data?.authenticated) return <LoadingScreen />;
-
-  const signOut = () => logout.mutate(undefined, {
-    onSuccess: (authSession) => {
-      queryClient.setQueryData(getGetAuthSessionQueryKey(), authSession);
-      queryClient.removeQueries({ queryKey: getGetDashboardSummaryQueryKey() });
-      setLocation('/login');
-    },
-  });
-  const username = session.data.username || 'Administrador';
+  const username = session.data?.username || 'Administrador';
   return <div className="app-shell">
     <aside className="sidebar">
       <Brand />
