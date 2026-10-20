@@ -43,12 +43,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3" data-testid="brand-livearena">
       <div className="brand-mark"><Swords size={18} strokeWidth={2.2} /></div>
-      {!compact && (
-        <div className="flex flex-col leading-tight">
-          <div className="brand-word">B.G.L <span>LIVE</span></div>
-          <span className="text-[9px] tracking-wider font-bold text-[#828998] uppercase">Brazas Gaming Live</span>
-        </div>
-      )}
+      {!compact && <div className="brand-word">BGL</div>}
     </div>
   );
 }
@@ -72,7 +67,7 @@ function QueryError({ onRetry, title = 'Não foi possível carregar o painel' }:
       <section className="error-card">
         <div className="mb-4 text-rose-300"><CircleHelp size={25} /></div>
         <h2>{title}</h2>
-        <p>Houve uma falha ao conectar com o B.G.L Brazas Gaming Live. Tente novamente em instantes.</p>
+        <p>Houve uma falha ao conectar com o BGL. Tente novamente em instantes.</p>
         <button className="btn-quiet inline-flex items-center gap-2" onClick={onRetry} data-testid="button-retry">
           <RotateCw size={13} /> Tentar novamente
         </button>
@@ -86,10 +81,6 @@ function Login() {
   const queryClient = useQueryClient();
   const session = useGetAuthSession();
   const login = useLoginAdmin();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     if (session.data?.authenticated) setLocation('/');
@@ -99,23 +90,16 @@ function Login() {
   if (session.isError) return <QueryError title="Não foi possível verificar o acesso" onRetry={() => void session.refetch()} />;
   if (session.data?.authenticated) return <LoadingScreen />;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setValidationError('');
-    if (!username.trim() || !password) {
-      setValidationError('Informe seu usuário e sua senha para continuar.');
-      return;
-    }
+  const handleOpenEnter = () => {
     login.mutate(
-      { data: { username: username.trim(), password } },
+      { data: { username: 'BGL', password: 'open' } },
       {
         onSuccess: (authSession) => {
           queryClient.setQueryData(getGetAuthSessionQueryKey(), authSession);
           void queryClient.invalidateQueries({ queryKey: getGetDashboardSummaryQueryKey() });
-          if (authSession.authenticated) setLocation('/');
-          else setValidationError('Acesso não autorizado. Confira seus dados e tente novamente.');
+          setLocation('/');
         },
-        onError: () => setValidationError('Não foi possível entrar. Confira seus dados e tente novamente.'),
+        onError: () => setLocation('/'),
       },
     );
   };
@@ -135,55 +119,21 @@ function Login() {
         <div className="login-card">
           <div className="flex items-center justify-between">
             <Brand compact />
-            <span className="rounded-full border border-[#343b42] px-2.5 py-1 text-[9px] font-bold tracking-[.12em] text-[#9299a7]">ADMIN</span>
+            <span className="rounded-full border border-[#343b42] px-2.5 py-1 text-[9px] font-bold tracking-[.12em] text-[#9299a7]">ACESSO LIVRE</span>
           </div>
-          <h2>Entrar no painel</h2>
-          <p className="intro">Acesse sua central para deixar tudo pronto para a próxima live.</p>
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="field-block">
-              <label className="form-label" htmlFor="admin-username">Usuário</label>
-              <input
-                id="admin-username"
-                className="form-input"
-                autoComplete="username"
-                placeholder="Seu usuário de administrador"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-                disabled={login.isPending}
-                data-testid="input-username"
-              />
-            </div>
-            <div className="field-block">
-              <label className="form-label" htmlFor="admin-password">Senha</label>
-              <div className="password-wrap">
-                <input
-                  id="admin-password"
-                  className="form-input"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="Digite sua senha"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  disabled={login.isPending}
-                  data-testid="input-password"
-                />
-                <button
-                  type="button"
-                  className="show-password"
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  data-testid="button-toggle-password"
-                >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
-              </div>
-            </div>
-            {validationError && <p className="form-error" role="alert" data-testid="status-login-error">{validationError}</p>}
-            <button type="submit" className="submit-button" disabled={login.isPending} data-testid="button-login">
-              {login.isPending ? <>Validando acesso… <RotateCw size={14} className="animate-spin" /></> : <>Entrar com segurança <ArrowRight size={15} /></>}
+          <h2>Painel de Controle</h2>
+          <p className="intro">Clique abaixo para entrar diretamente no painel BGL sem necessidade de senha.</p>
+          <div className="mt-6">
+            <button
+              type="button"
+              className="btn-accent w-full py-3.5 text-base font-bold flex items-center justify-center gap-2"
+              onClick={handleOpenEnter}
+              data-testid="button-enter-bgl"
+            >
+              <span>Entrar no BGL</span>
+              <ArrowRight size={18} />
             </button>
-          </form>
-          <p className="security-note flex items-center justify-center gap-2"><ShieldCheck size={13} /> Acesso restrito ao administrador da live</p>
+          </div>
         </div>
       </section>
     </main>
@@ -325,7 +275,7 @@ function Dashboard() {
               </div>
             </article>
           </section>
-          <div className="footer-note">B.G.L BRAZAS GAMING LIVE · CONTROLE DA SUA ARENA</div>
+          <div className="footer-note">BGL · CONTROLE DA SUA ARENA</div>
         </main>
       </div>
     </div>
@@ -395,7 +345,7 @@ function GamesLibrary() {
         const manifest = game.plugin.manifest;
         return <article className="featured-game" key={game.id} data-testid={`card-game-${game.id}`}>
           <div className="featured-art" style={{ background: manifest.thumbnail }}><span className="featured-ring" /><div className="featured-emblem"><Swords size={38} /></div><span className="featured-tag">{manifest.category.toLocaleUpperCase('pt-BR')}</span></div>
-          <div className="featured-copy"><span className="game-version">B.G.L ORIGINAL · V{manifest.version}</span><h2>{manifest.name}</h2><p>{manifest.description}</p><div className="game-meta">{manifest.formats.map((format) => <span key={format}>{format}</span>)}<span>5 presentes por lado</span></div>
+          <div className="featured-copy"><span className="game-version">BGL ORIGINAL · V{manifest.version}</span><h2>{manifest.name}</h2><p>{manifest.description}</p><div className="game-meta">{manifest.formats.map((format) => <span key={format}>{format}</span>)}<span>5 presentes por lado</span></div>
             <Link href={`/games/${game.id}/configure`} className="game-create-button" data-testid={`button-create-match-${game.id}`}>Criar partida <ArrowRight size={15} /></Link>
           </div>
           <div className="feature-index">{String(index + 1).padStart(2, '0')}</div>
@@ -408,7 +358,7 @@ function GamesLibrary() {
         <div className="future-game-art"><span>{String(index + 2).padStart(2, '0')}</span><i /></div><div className="future-card-copy"><span className="future-label">EM BREVE</span><h3>{game.name}</h3><p>{game.description}</p><span className="future-category">{game.category}</span></div>
       </article>)}
     </section>
-    <div className="footer-note">B.G.L BRAZAS GAMING LIVE · BIBLIOTECA DE JOGOS</div>
+    <div className="footer-note">BGL · BIBLIOTECA DE JOGOS</div>
   </GameShell>;
 }
 

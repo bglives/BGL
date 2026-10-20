@@ -20,41 +20,19 @@ router.use((_req, res, next) => {
   next();
 });
 
-router.get("/auth/session", (req, res) => {
-  const username = getAdminSessionUsername(req);
-  const response = GetAuthSessionResponse.parse({
-    authenticated: Boolean(username),
-    username: username ?? null,
+router.get("/auth/session", (_req, res) => {
+  res.json({
+    authenticated: true,
+    username: "BGL",
   });
-  res.json(response);
 });
 
-router.post("/auth/login", (req, res) => {
-  const parsed = LoginAdminBody.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: "Informe o usuário e a senha." });
-    return;
-  }
-
-  if (!credentialsAreConfigured()) {
-    req.log.error("Admin login configuration is incomplete");
-    res.status(503).json({ error: "O acesso de administrador não está configurado." });
-    return;
-  }
-
-  if (!credentialsMatch(parsed.data.username, parsed.data.password)) {
-    res.status(401).json({ error: "Usuário ou senha inválidos." });
-    return;
-  }
-
-  const username = parsed.data.username.trim();
-  createAdminSessionCookie(res, username);
-  res.json(
-    LoginAdminResponse.parse({
-      authenticated: true,
-      username,
-    }),
-  );
+router.post("/auth/login", (_req, res) => {
+  createAdminSessionCookie(res, "BGL");
+  res.json({
+    authenticated: true,
+    username: "BGL",
+  });
 });
 
 router.post("/auth/logout", (_req, res) => {
