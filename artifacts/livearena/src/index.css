@@ -730,7 +730,7 @@ select.config-input { appearance: none; padding-right: 30px; }
 }
 
 /* ========================================================
-   PALCO DOS CANDIDATOS E URNA COMPACTA
+   PALCO DOS CANDIDATOS (QUADRADOS LADO A LADO) E URNA
    ======================================================== */
 .election-stage {
   position: relative;
@@ -738,108 +738,111 @@ select.config-input { appearance: none; padding-right: 30px; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
-  justify-content: space-evenly;
+  justify-content: center;
   padding: 4px 0;
 }
 
-/* PALANQUE DOS CANDIDATOS (TRANSLÚCIDO E SEM BADGE DE NÚMERO EM CIMA) */
-.candidate-podium {
+/* QUADRADOS PEQUENOS LADO A LADO */
+.candidates-side-by-side {
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.candidate-square {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 8px;
   background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(10px);
   border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
-  padding: 8px 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.candidate-podium.side-a {
+.candidate-square.side-a {
   border-color: rgba(239, 68, 68, 0.45);
 }
 
-.candidate-podium.side-b {
+.candidate-square.side-b {
   border-color: rgba(34, 197, 94, 0.45);
 }
 
-.candidate-podium.is-leader {
-  transform: scale(1.01);
+.candidate-square.is-leader {
+  transform: scale(1.02);
   border-color: #f59e0b;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.25);
 }
 
 .leader-crown {
   position: absolute;
-  top: -9px;
-  right: 12px;
+  top: -8px;
+  right: 8px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   background: linear-gradient(135deg, #fbbf24, #d97706);
   color: #0b0d14;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 900;
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 9999px;
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
   z-index: 5;
 }
 
-.candidate-photo-frame {
-  width: 75px;
-  height: 85px;
-  flex-shrink: 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.candidate-square-photo-frame {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
-.candidate-photo {
+.candidate-square-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
 }
 
-.podium-base {
-  flex: 1;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  margin: 0;
+.candidate-square-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  width: 100%;
 }
 
 .candidate-name {
-  font-size: 16px;
-  font-weight: 900;
+  font-size: 13.5px;
+  font-weight: 800;
   margin: 0;
   color: #ffffff;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .candidate-live-votes {
   display: flex;
   align-items: baseline;
-  gap: 5px;
+  gap: 4px;
   margin-top: 2px;
 }
 
 .candidate-live-votes .vote-counter {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 900;
   font-family: var(--app-font-mono);
   color: #38bdf8;
@@ -847,7 +850,7 @@ select.config-input { appearance: none; padding-right: 30px; }
 }
 
 .candidate-live-votes small {
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 800;
   color: #94a3b8;
 }

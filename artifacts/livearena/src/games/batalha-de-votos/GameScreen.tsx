@@ -249,33 +249,62 @@ export function GameScreen({
         </div>
       </section>
 
-      {/* 3. O PALCO DA DISPUTA: CANDIDATOS E URNA ELETRÔNICA COMPACTA */}
+      {/* 3. O PALCO DA DISPUTA: QUADRADOS PEQUENOS LADO A LADO DOS CANDIDATOS */}
       <section className="election-stage">
-        {/* CANDIDATO A (SEM O NÚMERO/BADGE DE CIMA) */}
-        <article className={`candidate-podium side-a ${currentLeader === 'A' ? 'is-leader' : ''}`}>
-          {currentLeader === 'A' && (
-            <div className="leader-crown">
-              <Trophy size={14} />
-              <span>1º LUGAR</span>
-            </div>
-          )}
+        {/* QUADRADOS PEQUENOS LADO A LADO */}
+        <div className="candidates-side-by-side">
+          {/* CANDIDATO A (QUADRADO PEQUENO) */}
+          <article className={`candidate-square side-a ${currentLeader === 'A' ? 'is-leader' : ''}`}>
+            {currentLeader === 'A' && (
+              <div className="leader-crown">
+                <Trophy size={12} />
+                <span>1º LUGAR</span>
+              </div>
+            )}
 
-          <div className="candidate-photo-frame">
-            <img
-              src={defaultPhotoA}
-              alt={`Candidato ${candidateA.name}`}
-              className="candidate-photo"
-            />
-          </div>
-
-          <div className="podium-base">
-            <h2 className="candidate-name">{candidateA.name || 'Lula'}</h2>
-            <div className="candidate-live-votes">
-              <span className="vote-counter">{state.scoreA.toLocaleString('pt-BR')}</span>
-              <small>VOTOS</small>
+            <div className="candidate-square-photo-frame">
+              <img
+                src={defaultPhotoA}
+                alt={`Candidato ${candidateA.name}`}
+                className="candidate-square-photo"
+              />
             </div>
-          </div>
-        </article>
+
+            <div className="candidate-square-info">
+              <h2 className="candidate-name">{candidateA.name || 'Lula'}</h2>
+              <div className="candidate-live-votes">
+                <span className="vote-counter">{state.scoreA.toLocaleString('pt-BR')}</span>
+                <small>VOTOS</small>
+              </div>
+            </div>
+          </article>
+
+          {/* CANDIDATO B (QUADRADO PEQUENO) */}
+          <article className={`candidate-square side-b ${currentLeader === 'B' ? 'is-leader' : ''}`}>
+            {currentLeader === 'B' && (
+              <div className="leader-crown">
+                <Trophy size={12} />
+                <span>1º LUGAR</span>
+              </div>
+            )}
+
+            <div className="candidate-square-photo-frame">
+              <img
+                src={defaultPhotoB}
+                alt={`Candidato ${candidateB.name}`}
+                className="candidate-square-photo"
+              />
+            </div>
+
+            <div className="candidate-square-info">
+              <h2 className="candidate-name">{candidateB.name || 'Bolsonaro'}</h2>
+              <div className="candidate-live-votes">
+                <span className="vote-counter">{state.scoreB.toLocaleString('pt-BR')}</span>
+                <small>VOTOS</small>
+              </div>
+            </div>
+          </article>
+        </div>
 
         {/* ======================================================== */}
         {/* URNA ELETRÔNICA CENTRAL (COMPACTA, MENOR E SEM LOGO BGL) */}
@@ -335,32 +364,6 @@ export function GameScreen({
             </div>
           ))}
         </div>
-
-        {/* CANDIDATO B (SEM O NÚMERO/BADGE DE CIMA) */}
-        <article className={`candidate-podium side-b ${currentLeader === 'B' ? 'is-leader' : ''}`}>
-          {currentLeader === 'B' && (
-            <div className="leader-crown">
-              <Trophy size={14} />
-              <span>1º LUGAR</span>
-            </div>
-          )}
-
-          <div className="candidate-photo-frame">
-            <img
-              src={defaultPhotoB}
-              alt={`Candidato ${candidateB.name}`}
-              className="candidate-photo"
-            />
-          </div>
-
-          <div className="podium-base">
-            <h2 className="candidate-name">{candidateB.name || 'Bolsonaro'}</h2>
-            <div className="candidate-live-votes">
-              <span className="vote-counter">{state.scoreB.toLocaleString('pt-BR')}</span>
-              <small>VOTOS</small>
-            </div>
-          </div>
-        </article>
       </section>
 
       {/* 4. MODAL DE VITÓRIA / ENCERRAMENTO OFICIAL DAS ELEIÇÕES (SEM BGL) */}
