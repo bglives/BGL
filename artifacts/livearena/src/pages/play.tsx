@@ -5,30 +5,30 @@ import { createInitialState } from '@workspace/game-engine';
 import { GameScreen, type CandidateDisplay } from '@/games/batalha-de-votos/GameScreen';
 
 const defaultCandidateA: CandidateDisplay = {
-  name: 'Candidato 1',
-  color: '#10b981',
-  number: '',
+  name: 'Lula',
+  color: '#ef4444',
+  number: '13',
   avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80',
   gifts: [
-    { id: 'gift-rose', name: 'Rosa', votes: 1, costCoins: 1 },
-    { id: 'gift-ice-cream', name: 'Sorvete', votes: 2, costCoins: 2 },
-    { id: 'gift-donut', name: 'Donut', votes: 5, costCoins: 5 },
-    { id: 'gift-perfume', name: 'Perfume', votes: 10, costCoins: 10 },
-    { id: 'gift-lion', name: 'Leão Presidencial', votes: 50, costCoins: 50 },
+    { id: 'gift-rose', name: 'Rosa', votes: 2, costCoins: 1 },
+    { id: 'gift-ice-cream', name: 'Sorvete', votes: 4, costCoins: 2 },
+    { id: 'gift-donut', name: 'Donut', votes: 10, costCoins: 5 },
+    { id: 'gift-perfume', name: 'Perfume', votes: 20, costCoins: 10 },
+    { id: 'gift-lion', name: 'Leão Eleitoral', votes: 100, costCoins: 50 },
   ],
 };
 
 const defaultCandidateB: CandidateDisplay = {
-  name: 'Candidato 2',
-  color: '#ef4444',
-  number: '',
+  name: 'Bolsonaro',
+  color: '#22c55e',
+  number: '22',
   avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
   gifts: [
-    { id: 'gift-heart', name: 'Coração', votes: 1, costCoins: 1 },
-    { id: 'gift-coffee', name: 'Café', votes: 2, costCoins: 2 },
-    { id: 'gift-crown', name: 'Coroa', votes: 5, costCoins: 5 },
-    { id: 'gift-rocket', name: 'Foguete', votes: 10, costCoins: 10 },
-    { id: 'gift-trophy', name: 'Troféu Eleitoral', votes: 50, costCoins: 50 },
+    { id: 'gift-heart', name: 'Coração', votes: 2, costCoins: 1 },
+    { id: 'gift-coffee', name: 'Café', votes: 4, costCoins: 2 },
+    { id: 'gift-crown', name: 'Coroa', votes: 10, costCoins: 5 },
+    { id: 'gift-rocket', name: 'Foguete', votes: 20, costCoins: 10 },
+    { id: 'gift-trophy', name: 'Troféu Oficial', votes: 100, costCoins: 50 },
   ],
 };
 
@@ -233,7 +233,9 @@ export function PlayGame() {
       }).catch(() => {});
     }
 
-    const side = comment.startsWith('!b') ? 'B' : 'A';
+    const trimmed = comment.trim().toLowerCase();
+    const isB = trimmed === '22' || trimmed.startsWith('22') || trimmed.startsWith('!22') || trimmed === 'b' || trimmed.startsWith('!b');
+    const side = isB ? 'B' : 'A';
     setState((prev) => ({
       ...prev,
       scoreA: side === 'A' ? prev.scoreA + 1 : prev.scoreA,

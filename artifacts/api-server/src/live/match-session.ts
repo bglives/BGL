@@ -188,20 +188,26 @@ export class MatchSession {
       let side: Side | null = null;
       const candA = (this.config as any)?.candidateA;
       const candB = (this.config as any)?.candidateB;
-      const numA = candA?.number ? String(candA.number).trim().toLowerCase() : null;
-      const numB = candB?.number ? String(candB.number).trim().toLowerCase() : null;
+      const numA = candA?.number ? String(candA.number).trim().toLowerCase() : '13';
+      const numB = candB?.number ? String(candB.number).trim().toLowerCase() : '22';
 
       const matchesA =
+        comment === '13' ||
+        comment.startsWith('13 ') ||
+        comment.startsWith('!13') ||
+        comment.includes('13') ||
+        (numA && numA !== '13' && (comment === numA || comment.startsWith(`${numA} `) || comment.startsWith(`!${numA}`))) ||
         comment === 'a' ||
-        comment.startsWith('a ') ||
-        comment.startsWith('!a') ||
-        (numA ? comment === numA || comment.startsWith(`${numA} `) || comment.startsWith(`!${numA}`) : comment === '1' || comment === '10' || comment.startsWith('!1'));
+        comment.startsWith('!a');
 
       const matchesB =
+        comment === '22' ||
+        comment.startsWith('22 ') ||
+        comment.startsWith('!22') ||
+        comment.includes('22') ||
+        (numB && numB !== '22' && (comment === numB || comment.startsWith(`${numB} `) || comment.startsWith(`!${numB}`))) ||
         comment === 'b' ||
-        comment.startsWith('b ') ||
-        comment.startsWith('!b') ||
-        (numB ? comment === numB || comment.startsWith(`${numB} `) || comment.startsWith(`!${numB}`) : comment === '2' || comment === '20' || comment.startsWith('!2'));
+        comment.startsWith('!b');
 
       if (matchesA && !matchesB) {
         side = 'A';
