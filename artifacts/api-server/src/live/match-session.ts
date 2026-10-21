@@ -186,9 +186,23 @@ export class MatchSession {
     if (liveEvent.type === 'chat') {
       const comment = liveEvent.data.comment.trim().toLowerCase();
       let side: Side | null = null;
-      if (comment.startsWith('!a') || comment.startsWith('!1')) {
+      if (
+        comment === 'a' ||
+        comment.startsWith('a ') ||
+        comment.startsWith('!a') ||
+        comment === '1' ||
+        comment === '10' ||
+        comment.startsWith('!1')
+      ) {
         side = 'A';
-      } else if (comment.startsWith('!b') || comment.startsWith('!2')) {
+      } else if (
+        comment === 'b' ||
+        comment.startsWith('b ') ||
+        comment.startsWith('!b') ||
+        comment === '2' ||
+        comment === '20' ||
+        comment.startsWith('!2')
+      ) {
         side = 'B';
       }
 

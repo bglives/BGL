@@ -358,7 +358,7 @@ export function GameScreen({
           {/* Instruções Candidato A */}
           <div className="candidate-gifts-row side-a">
             <span className="vote-call">
-              Votar em <strong>{candidateA.name || 'Candidato 1'}</strong> (digite <code>!a</code>)
+              Votar em <strong>{candidateA.name || 'Candidato 1'}</strong> (digite <code>A</code> ou <code>10</code>)
             </span>
             <div className="gifts-strip">
               {candidateA.gifts.map((g) => (
@@ -378,7 +378,7 @@ export function GameScreen({
           {/* Instruções Candidato B */}
           <div className="candidate-gifts-row side-b">
             <span className="vote-call">
-              Votar em <strong>{candidateB.name || 'Candidato 2'}</strong> (digite <code>!b</code>)
+              Votar em <strong>{candidateB.name || 'Candidato 2'}</strong> (digite <code>B</code> ou <code>20</code>)
             </span>
             <div className="gifts-strip">
               {candidateB.gifts.map((g) => (
@@ -486,17 +486,17 @@ export function GameScreen({
             <button
               type="button"
               className="sim-btn btn-special"
-              onClick={() => onSimulateChat?.('!a')}
+              onClick={() => onSimulateChat?.('a')}
             >
-              Chat !a (+1)
+              Comentar "A" (+1)
             </button>
 
             <button
               type="button"
               className="sim-btn btn-special"
-              onClick={() => onSimulateChat?.('!b')}
+              onClick={() => onSimulateChat?.('b')}
             >
-              Chat !b (+1)
+              Comentar "B" (+1)
             </button>
 
             <button

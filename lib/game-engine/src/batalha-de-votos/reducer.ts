@@ -7,7 +7,7 @@ export type AnimationLevel = 'small' | 'medium' | 'epic';
 
 export const INITIAL_COUNTDOWN_MS = 3_000;
 export const COMBO_WINDOW_MS = 5_000;
-export const CHAT_VOTE_COOLDOWN_MS = 10_000;
+export const CHAT_VOTE_COOLDOWN_MS = 0; // 0ms = sem tempo de espera, conforme comenta sobe 1 voto
 export const SURPRISE_EVENT_MS = 15_000;
 export const POWER_UP_DURATION_MS = 5_000;
 export const METRIC_INTERVAL_MS = 10_000;

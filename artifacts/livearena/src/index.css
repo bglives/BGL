@@ -511,43 +511,63 @@ select.config-input { appearance: none; padding-right: 30px; }
 .election-arena {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  background: radial-gradient(circle at 50% 25%, #181f33 0%, #0a0d18 70%, #04050a 100%);
+  max-width: 540px; /* Proporção exata 9:16 para TikTok Live */
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: radial-gradient(circle at 50% 20%, #101726 0%, #070a12 60%, #020306 100%);
   color: #f1f5f9;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  padding: 12px 16px;
+  padding: 14px 14px 18px;
   font-family: var(--app-font-sans);
   user-select: none;
+  box-shadow: 0 0 80px rgba(0, 210, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Fundo luxuoso de iluminação neon */
+.election-arena::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(0, 210, 255, 0.22) 0%, rgba(138, 43, 226, 0.1) 50%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .election-header {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 16px;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  gap: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(20, 28, 45, 0.85) 0%, rgba(10, 14, 25, 0.85) 100%);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 .election-live-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
-  padding: 4px 10px;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 5px 11px;
   border-radius: 9999px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
 }
 
 .live-dot {
@@ -555,67 +575,206 @@ select.config-input { appearance: none; padding-right: 30px; }
   height: 8px;
   background: #ef4444;
   border-radius: 50%;
-  box-shadow: 0 0 10px #ef4444;
+  box-shadow: 0 0 12px #ef4444;
   animation: pulse 1.5s infinite;
 }
 
 .election-title {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
   color: #f8fafc;
   text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .election-round-indicator {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 4px 12px;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(0, 210, 255, 0.1);
+  padding: 5px 12px;
   border-radius: 9999px;
+  border: 1px solid rgba(0, 210, 255, 0.3);
   color: #38bdf8;
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.18);
 }
 
 .plantao-banner {
-  margin: 6px 0;
-  padding: 10px 18px;
-  background: linear-gradient(90deg, #b91c1c 0%, #dc2626 50%, #b91c1c 100%);
+  position: relative;
+  z-index: 2;
+  margin: 8px 0;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, #b91c1c 0%, #ef4444 50%, #b91c1c 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 900;
-  letter-spacing: 0.05em;
-  box-shadow: 0 0 25px rgba(220, 38, 38, 0.6);
+  letter-spacing: 0.06em;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.7);
   animation: pulse 1s infinite alternate;
 }
 
-/* PALCO PRINCIPAL */
+/* PALCO PRINCIPAL VERTICAL 9:16 */
 .election-stage {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: 16px;
-  flex: 1;
-  padding: 10px 0;
   position: relative;
-}
-
-/* PALANQUES DOS CANDIDATOS */
-.candidate-podium {
-  flex: 1;
-  max-width: 280px;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 12px;
+  flex: 1;
+  padding: 10px 0;
+}
+
+/* PALANQUES DOS CANDIDATOS EM 9:16 */
+.candidate-podium {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
   position: relative;
-  transition: transform 0.3s ease;
+  background: linear-gradient(135deg, rgba(20, 28, 45, 0.7) 0%, rgba(12, 17, 29, 0.7) 100%);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.candidate-podium.side-a {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.18);
+}
+
+.candidate-podium.side-b {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.18);
+}
+
+.candidate-podium.is-leader {
+  transform: scale(1.02);
+  border-color: #f59e0b;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.35);
+}
+
+.leader-crown {
+  position: absolute;
+  top: -12px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #0b0d14;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.7);
+  z-index: 5;
+}
+
+.candidate-photo-frame {
+  width: 90px;
+  height: 105px;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.podium-base {
+  flex: 1;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.candidate-badge-num {
+  position: static;
+  display: inline-block;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
+  font-weight: 900;
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+
+.candidate-name {
+  font-size: 18px;
+  font-weight: 900;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.candidate-live-votes {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.candidate-live-votes .vote-counter {
+  font-size: 26px;
+  font-weight: 900;
+  font-family: var(--app-font-mono);
+  color: #38bdf8;
+  text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+}
+
+.candidate-live-votes small {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================================
+   URNA ELETRÔNICA CENTRAL
+   ======================================================== */
+.election-urna {
+  width: 100%;
+  background: linear-gradient(145deg, #182236 0%, #0d1424 70%, #070b14 100%);
+  border: 2px solid rgba(0, 210, 255, 0.4);
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 210, 255, 0.15);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .candidate-podium.is-leader {

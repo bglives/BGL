@@ -78,14 +78,26 @@ function Toggle({ label, description, checked, onChange, testId }: { label: stri
   </label>;
 }
 
-function GiftRows({ side, control, register, errors }: {
+function GiftRows({ side, control, register, setValue, errors }: {
   side: 'candidateA' | 'candidateB';
   control: ReturnType<typeof useForm<BatalhaDeVotosConfig>>['control'];
   register: ReturnType<typeof useForm<BatalhaDeVotosConfig>>['register'];
+  setValue: ReturnType<typeof useForm<BatalhaDeVotosConfig>>['setValue'];
   errors: ReturnType<typeof useForm<BatalhaDeVotosConfig>>['formState']['errors'];
 }) {
   const { fields } = useFieldArray({ control, name: `${side}.gifts` });
   const colorName = side === 'candidateA' ? 'A' : 'B';
+
+  const handleGiftImageUpload = (index: number, file?: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setValue(`${side}.gifts.${index}.imageUrl`, dataUrl, { shouldDirty: true });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return <div className="gift-list">
     {fields.map((field, index) => {
       const giftError = errors[side]?.gifts?.[index];
@@ -97,7 +109,26 @@ function GiftRows({ side, control, register, errors }: {
           <label><span>Custo em moedas</span><input className="config-input" type="number" min="1" {...register(`${side}.gifts.${index}.costCoins`)} data-testid={`input-gift-${colorName}-${index + 1}-cost`} /><FieldError>{giftError?.costCoins?.message}</FieldError></label>
           <label><span>Votos</span><input className="config-input" type="number" min="1" {...register(`${side}.gifts.${index}.votes`)} data-testid={`input-gift-${colorName}-${index + 1}-votes`} /><FieldError>{giftError?.votes?.message}</FieldError></label>
         </div>
-        <label className="gift-image-url"><span>Imagem (URL opcional)</span><input className="config-input" placeholder="https://" {...register(`${side}.gifts.${index}.imageUrl`)} data-testid={`input-gift-${colorName}-${index + 1}-image`} /></label>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-1.5 p-2 bg-[#10141e] rounded-lg border border-[#252b38]">
+          <div className="flex items-center gap-2">
+            <label className="cursor-pointer text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 py-1 px-2.5 rounded bg-cyan-950/60 border border-cyan-800/60">
+              <span>📁 Escolher Imagem (PNG / JPG)</span>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => handleGiftImageUpload(index, e.target.files?.[0])}
+              />
+            </label>
+            <span className="text-[10px] text-gray-500">ou cole URL:</span>
+          </div>
+          <input
+            className="config-input !min-h-[30px] !text-[10px] flex-1"
+            placeholder="URL opcional (https://...)"
+            {...register(`${side}.gifts.${index}.imageUrl`)}
+            data-testid={`input-gift-${colorName}-${index + 1}-image`}
+          />
+        </div>
       </div>;
     })}
     <FieldError>{errors[side]?.gifts?.message || (side === 'candidateB' ? errors.candidateB?.gifts?.root?.message : undefined)}</FieldError>
@@ -257,7 +288,7 @@ export function ConfigForm() {
             <label className="config-field"><span>Cor principal</span><div className="color-control"><input type="color" {...register(`${side}.color`)} data-testid={`input-candidate-${isA ? 'a' : 'b'}-color`} /><code>{isA ? candidateA?.color : candidateB?.color}</code></div><FieldError>{errors[side]?.color?.message}</FieldError></label>
             <label className="config-field avatar-upload"><span>Avatar · JPG, PNG ou WEBP · até 8 MB</span><input className="config-input file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => onAvatarFile(side, event.target.files?.[0])} data-testid={`input-candidate-${isA ? 'a' : 'b'}-avatar`} />{(isA ? avatarPreviewA : avatarPreviewB) && <img className="avatar-local-preview" src={isA ? avatarPreviewA : avatarPreviewB} alt={`Prévia local do avatar do candidato ${isA ? 'A' : 'B'}`} data-testid={`preview-candidate-${isA ? 'a' : 'b'}-avatar`} />}<FieldError>{errors[side]?.avatar?.message as string}</FieldError></label>
           </div>
-          <GiftRows side={side} control={control} register={register} errors={errors} />
+          <GiftRows side={side} control={control} register={register} setValue={setValue} errors={errors} />
         </div>;
       })}
       <FieldError>{errors.candidateB?.gifts?.message}</FieldError>
