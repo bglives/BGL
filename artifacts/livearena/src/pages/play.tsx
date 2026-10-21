@@ -7,7 +7,7 @@ import { GameScreen, type CandidateDisplay } from '@/games/batalha-de-votos/Game
 const defaultCandidateA: CandidateDisplay = {
   name: 'Candidato 1',
   color: '#10b981',
-  number: '10',
+  number: '',
   avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80',
   gifts: [
     { id: 'gift-rose', name: 'Rosa', votes: 1, costCoins: 1 },
@@ -21,7 +21,7 @@ const defaultCandidateA: CandidateDisplay = {
 const defaultCandidateB: CandidateDisplay = {
   name: 'Candidato 2',
   color: '#ef4444',
-  number: '20',
+  number: '',
   avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
   gifts: [
     { id: 'gift-heart', name: 'Coração', votes: 1, costCoins: 1 },
@@ -57,6 +57,7 @@ export function PlayGame() {
           setCandidateA((prev) => ({
             ...prev,
             name: ca.name || prev.name,
+            number: ca.number !== undefined ? ca.number : prev.number,
             color: ca.color || prev.color,
             avatarUrl: ca.avatarDataUrl || ca.avatarUrl || prev.avatarUrl,
             gifts: ca.gifts?.length ? ca.gifts : prev.gifts,
@@ -67,6 +68,7 @@ export function PlayGame() {
           setCandidateB((prev) => ({
             ...prev,
             name: cb.name || prev.name,
+            number: cb.number !== undefined ? cb.number : prev.number,
             color: cb.color || prev.color,
             avatarUrl: cb.avatarDataUrl || cb.avatarUrl || prev.avatarUrl,
             gifts: cb.gifts?.length ? cb.gifts : prev.gifts,
@@ -124,6 +126,7 @@ export function PlayGame() {
             setCandidateA((prev) => ({
               ...prev,
               name: cfg.candidateA.name || prev.name,
+              number: cfg.candidateA.number !== undefined ? cfg.candidateA.number : prev.number,
               color: cfg.candidateA.color || prev.color,
               avatarUrl: cfg.candidateA.avatarDataUrl || prev.avatarUrl,
               gifts: cfg.candidateA.gifts?.length ? cfg.candidateA.gifts : prev.gifts,
@@ -134,6 +137,7 @@ export function PlayGame() {
             setCandidateB((prev) => ({
               ...prev,
               name: cfg.candidateB.name || prev.name,
+              number: cfg.candidateB.number !== undefined ? cfg.candidateB.number : prev.number,
               color: cfg.candidateB.color || prev.color,
               avatarUrl: cfg.candidateB.avatarDataUrl || prev.avatarUrl,
               gifts: cfg.candidateB.gifts?.length ? cfg.candidateB.gifts : prev.gifts,

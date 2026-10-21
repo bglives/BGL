@@ -186,23 +186,26 @@ export class MatchSession {
     if (liveEvent.type === 'chat') {
       const comment = liveEvent.data.comment.trim().toLowerCase();
       let side: Side | null = null;
-      if (
+      const candA = (this.config as any)?.candidateA;
+      const candB = (this.config as any)?.candidateB;
+      const numA = candA?.number ? String(candA.number).trim().toLowerCase() : null;
+      const numB = candB?.number ? String(candB.number).trim().toLowerCase() : null;
+
+      const matchesA =
         comment === 'a' ||
         comment.startsWith('a ') ||
         comment.startsWith('!a') ||
-        comment === '1' ||
-        comment === '10' ||
-        comment.startsWith('!1')
-      ) {
-        side = 'A';
-      } else if (
+        (numA ? comment === numA || comment.startsWith(`${numA} `) || comment.startsWith(`!${numA}`) : comment === '1' || comment === '10' || comment.startsWith('!1'));
+
+      const matchesB =
         comment === 'b' ||
         comment.startsWith('b ') ||
         comment.startsWith('!b') ||
-        comment === '2' ||
-        comment === '20' ||
-        comment.startsWith('!2')
-      ) {
+        (numB ? comment === numB || comment.startsWith(`${numB} `) || comment.startsWith(`!${numB}`) : comment === '2' || comment === '20' || comment.startsWith('!2'));
+
+      if (matchesA && !matchesB) {
+        side = 'A';
+      } else if (matchesB && !matchesA) {
         side = 'B';
       }
 

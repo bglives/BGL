@@ -93,4 +93,51 @@ describe('MatchSession and SimulationProvider', () => {
     await session.stop();
     unsubscribe();
   });
+
+  it('supports custom candidate voting numbers (e.g., 13 and 22)', async () => {
+    const customConfig = {
+      ...mockConfig,
+      candidateA: {
+        ...mockConfig.candidateA,
+        number: '13',
+      },
+      candidateB: {
+        ...mockConfig.candidateB,
+        number: '22',
+      },
+    };
+
+    const session = new MatchSession({
+      id: 'test-custom-numbers',
+      config: customConfig,
+      isSimulation: true,
+    });
+
+    await session.start();
+    session.dispatch({
+      type: 'CLOCK_TICK',
+      nowMs: Date.now() + 4_000,
+    });
+    expect(session.getState().phase).toBe('rodando');
+
+    const provider = (session as any).provider as SimulationProvider;
+
+    // Vote with number 13
+    provider.simulateChat('13', { id: 'voter-1' });
+    expect(session.getState().scoreA).toBe(1);
+
+    // Vote with !22
+    provider.simulateChat('!22 lula nao', { id: 'voter-2' });
+    expect(session.getState().scoreB).toBe(1);
+
+    // Vote with letter A still works
+    provider.simulateChat('a', { id: 'voter-3' });
+    expect(session.getState().scoreA).toBe(2);
+
+    // Vote with letter B still works
+    provider.simulateChat('b', { id: 'voter-4' });
+    expect(session.getState().scoreB).toBe(2);
+
+    await session.stop();
+  });
 });

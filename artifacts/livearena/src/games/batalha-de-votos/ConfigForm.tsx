@@ -23,8 +23,8 @@ const defaultGiftsB = [
 
 const defaults: BatalhaDeVotosConfig = {
   title: 'Eleição 2026 · Ao Vivo',
-  candidateA: { name: 'Candidato 10', color: '#10b981', avatar: undefined, gifts: defaultGiftsA },
-  candidateB: { name: 'Candidato 20', color: '#ef4444', avatar: undefined, gifts: defaultGiftsB },
+  candidateA: { name: 'Candidato A', number: '', color: '#10b981', avatar: undefined, gifts: defaultGiftsA },
+  candidateB: { name: 'Candidato B', number: '', color: '#ef4444', avatar: undefined, gifts: defaultGiftsB },
   backgroundImage: undefined,
   backgroundVideo: undefined,
   format: 'vertical',
@@ -174,6 +174,7 @@ export function ConfigForm() {
         if (parsed.config?.candidateA) {
           const ca = parsed.config.candidateA;
           setValue('candidateA.name', ca.name);
+          setValue('candidateA.number', ca.number || '');
           setValue('candidateA.color', ca.color);
           if (ca.avatarDataUrl) {
             setAvatarPreviewA(ca.avatarDataUrl);
@@ -184,6 +185,7 @@ export function ConfigForm() {
         if (parsed.config?.candidateB) {
           const cb = parsed.config.candidateB;
           setValue('candidateB.name', cb.name);
+          setValue('candidateB.number', cb.number || '');
           setValue('candidateB.color', cb.color);
           if (cb.avatarDataUrl) {
             setAvatarPreviewB(cb.avatarDataUrl);
@@ -259,11 +261,13 @@ export function ConfigForm() {
         ...values,
         candidateA: {
           ...values.candidateA,
+          number: values.candidateA.number?.trim() || '',
           avatar: undefined,
           avatarDataUrl: values.candidateA.avatarDataUrl || avatarPreviewA || undefined,
         },
         candidateB: {
           ...values.candidateB,
+          number: values.candidateB.number?.trim() || '',
           avatar: undefined,
           avatarDataUrl: values.candidateB.avatarDataUrl || avatarPreviewB || undefined,
         },
@@ -346,6 +350,7 @@ export function ConfigForm() {
           <div className="candidate-heading"><span className="candidate-chip">{isA ? 'LADO A' : 'LADO B'}</span><span>5 presentes obrigatórios</span></div>
           <div className="choice-grid candidate-meta">
             <label className="config-field"><span>Nome do candidato {isA ? 'A' : 'B'}</span><input className="config-input" placeholder={`Nome do lado ${isA ? 'A' : 'B'}`} {...register(`${side}.name`)} data-testid={`input-candidate-${isA ? 'a' : 'b'}-name`} /><FieldError>{errors[side]?.name?.message}</FieldError></label>
+            <label className="config-field"><span>Número de votação <small className="text-cyan-400 font-normal">(ex: 13, 22 ou vazio para apenas A / B)</small></span><input className="config-input" placeholder={isA ? "Ex.: 13 (ou vazio para A)" : "Ex.: 22 (ou vazio para B)"} {...register(`${side}.number`)} data-testid={`input-candidate-${isA ? 'a' : 'b'}-number`} /><FieldError>{errors[side]?.number?.message}</FieldError></label>
             <label className="config-field"><span>Cor principal</span><div className="color-control"><input type="color" {...register(`${side}.color`)} data-testid={`input-candidate-${isA ? 'a' : 'b'}-color`} /><code>{isA ? candidateA?.color : candidateB?.color}</code></div><FieldError>{errors[side]?.color?.message}</FieldError></label>
             <label className="config-field avatar-upload"><span>Avatar · JPG, PNG ou WEBP · até 8 MB</span><input className="config-input file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => onAvatarFile(side, event.target.files?.[0])} data-testid={`input-candidate-${isA ? 'a' : 'b'}-avatar`} />{(isA ? avatarPreviewA : avatarPreviewB) && <img className="avatar-local-preview" src={isA ? avatarPreviewA : avatarPreviewB} alt={`Prévia local do avatar do candidato ${isA ? 'A' : 'B'}`} data-testid={`preview-candidate-${isA ? 'a' : 'b'}-avatar`} />}<FieldError>{errors[side]?.avatar?.message as string}</FieldError></label>
           </div>

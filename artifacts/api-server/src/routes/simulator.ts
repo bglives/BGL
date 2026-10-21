@@ -79,7 +79,14 @@ router.post('/matches/:id/simulate/chat', (req, res): void => {
 
   const { comment, donorName } = req.body;
   const text = (comment || '').trim().toLowerCase();
-  const side = text.startsWith('!b') || text.startsWith('!2') ? 'B' : 'A';
+  const candB = (session.config as any)?.candidateB;
+  const numB = candB?.number ? String(candB.number).trim().toLowerCase() : null;
+  const isB =
+    text === 'b' ||
+    text.startsWith('b ') ||
+    text.startsWith('!b') ||
+    (numB ? text === numB || text.startsWith(`${numB} `) || text.startsWith(`!${numB}`) : text.startsWith('!2'));
+  const side = isB ? 'B' : 'A';
 
   session.dispatch({
     type: 'CHAT_VOTE',

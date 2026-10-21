@@ -253,7 +253,7 @@ export function GameScreen({
           </div>
 
           <div className="podium-base">
-            <span className="candidate-badge-num">10</span>
+            <span className="candidate-badge-num">{candidateA.number?.trim() || 'A'}</span>
             <h2 className="candidate-name">{candidateA.name || 'Candidato 1'}</h2>
             <div className="candidate-live-votes">
               <span className="vote-counter">{state.scoreA.toLocaleString('pt-BR')}</span>
@@ -347,7 +347,7 @@ export function GameScreen({
           </div>
 
           <div className="podium-base">
-            <span className="candidate-badge-num">20</span>
+            <span className="candidate-badge-num">{candidateB.number?.trim() || 'B'}</span>
             <h2 className="candidate-name">{candidateB.name || 'Candidato 2'}</h2>
             <div className="candidate-live-votes">
               <span className="vote-counter">{state.scoreB.toLocaleString('pt-BR')}</span>
@@ -367,7 +367,7 @@ export function GameScreen({
           {/* Instruções Candidato A */}
           <div className="candidate-gifts-row side-a">
             <span className="vote-call">
-              Votar em <strong>{candidateA.name || 'Candidato 1'}</strong> (digite <code>A</code> ou <code>10</code>)
+              Votar em <strong>{candidateA.name || 'Candidato 1'}</strong> (digite <code>A</code>{candidateA.number?.trim() ? <> ou <code>{candidateA.number.trim()}</code></> : null})
             </span>
             <div className="gifts-strip">
               {candidateA.gifts.map((g) => (
@@ -387,7 +387,7 @@ export function GameScreen({
           {/* Instruções Candidato B */}
           <div className="candidate-gifts-row side-b">
             <span className="vote-call">
-              Votar em <strong>{candidateB.name || 'Candidato 2'}</strong> (digite <code>B</code> ou <code>20</code>)
+              Votar em <strong>{candidateB.name || 'Candidato 2'}</strong> (digite <code>B</code>{candidateB.number?.trim() ? <> ou <code>{candidateB.number.trim()}</code></> : null})
             </span>
             <div className="gifts-strip">
               {candidateB.gifts.map((g) => (
@@ -495,17 +495,17 @@ export function GameScreen({
             <button
               type="button"
               className="sim-btn btn-special"
-              onClick={() => onSimulateChat?.('a')}
+              onClick={() => onSimulateChat?.(candidateA.number?.trim() || 'a')}
             >
-              Comentar "A" (+1)
+              Comentar "{candidateA.number?.trim() || 'A'}" (+1)
             </button>
 
             <button
               type="button"
               className="sim-btn btn-special"
-              onClick={() => onSimulateChat?.('b')}
+              onClick={() => onSimulateChat?.(candidateB.number?.trim() || 'b')}
             >
-              Comentar "B" (+1)
+              Comentar "{candidateB.number?.trim() || 'B'}" (+1)
             </button>
 
             <button

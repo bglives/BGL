@@ -19,6 +19,7 @@ const giftSchema = z.object({
 
 const candidateSchema = z.object({
   name: z.string().trim().min(1, 'Informe o nome do candidato.'),
+  number: z.string().trim().max(10, 'Máximo 10 caracteres.').optional(),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Escolha uma cor válida.'),
   avatar: z.union([imageFile, z.string()]).optional(),
   avatarDataUrl: z.string().optional(),
