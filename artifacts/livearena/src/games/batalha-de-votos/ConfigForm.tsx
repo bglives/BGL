@@ -159,11 +159,47 @@ export function ConfigForm() {
   const [showPreviewNotice, setShowPreviewNotice] = useState(false);
   const { fields: goalFields, append: appendGoal, remove: removeGoal } = useFieldArray({ control, name: 'collectiveGoals' });
 
+  // Carregar dados salvos anteriormente no formulário
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('livearena_active_config');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.title) setValue('title', parsed.title);
+        if (parsed.config?.backgroundImage || parsed.config?.backgroundDataUrl) {
+          const bg = parsed.config.backgroundDataUrl || parsed.config.backgroundImage;
+          setImagePreview(bg);
+          setValue('backgroundDataUrl', bg);
+        }
+        if (parsed.config?.candidateA) {
+          const ca = parsed.config.candidateA;
+          setValue('candidateA.name', ca.name);
+          setValue('candidateA.color', ca.color);
+          if (ca.avatarDataUrl) {
+            setAvatarPreviewA(ca.avatarDataUrl);
+            setValue('candidateA.avatarDataUrl', ca.avatarDataUrl);
+          }
+          if (ca.gifts?.length) setValue('candidateA.gifts', ca.gifts);
+        }
+        if (parsed.config?.candidateB) {
+          const cb = parsed.config.candidateB;
+          setValue('candidateB.name', cb.name);
+          setValue('candidateB.color', cb.color);
+          if (cb.avatarDataUrl) {
+            setAvatarPreviewB(cb.avatarDataUrl);
+            setValue('candidateB.avatarDataUrl', cb.avatarDataUrl);
+          }
+          if (cb.gifts?.length) setValue('candidateB.gifts', cb.gifts);
+        }
+      }
+    } catch {}
+  }, [setValue]);
+
   useEffect(() => () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    if (videoPreview) URL.revokeObjectURL(videoPreview);
-    if (avatarPreviewA) URL.revokeObjectURL(avatarPreviewA);
-    if (avatarPreviewB) URL.revokeObjectURL(avatarPreviewB);
+    if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
+    if (videoPreview && videoPreview.startsWith('blob:')) URL.revokeObjectURL(videoPreview);
+    if (avatarPreviewA && avatarPreviewA.startsWith('blob:')) URL.revokeObjectURL(avatarPreviewA);
+    if (avatarPreviewB && avatarPreviewB.startsWith('blob:')) URL.revokeObjectURL(avatarPreviewB);
   }, [imagePreview, videoPreview, avatarPreviewA, avatarPreviewB]);
 
   const setPresetValues = (value: Preset) => {
@@ -177,6 +213,15 @@ export function ConfigForm() {
     if (field === 'backgroundImage') {
       if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(nextPreview);
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setValue('backgroundDataUrl', e.target?.result as string, { shouldDirty: true });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setValue('backgroundDataUrl', undefined, { shouldDirty: true });
+      }
     } else {
       if (videoPreview) URL.revokeObjectURL(videoPreview);
       setVideoPreview(nextPreview);
@@ -215,14 +260,30 @@ export function ConfigForm() {
         candidateA: {
           ...values.candidateA,
           avatar: undefined,
+          avatarDataUrl: values.candidateA.avatarDataUrl || avatarPreviewA || undefined,
         },
         candidateB: {
           ...values.candidateB,
           avatar: undefined,
+          avatarDataUrl: values.candidateB.avatarDataUrl || avatarPreviewB || undefined,
         },
         backgroundImage: undefined,
+        backgroundDataUrl: values.backgroundDataUrl || undefined,
         backgroundVideo: undefined,
       };
+
+      // Salvar imediatamente no localStorage para garantir visualização no teste/preview
+      try {
+        localStorage.setItem(
+          'livearena_active_config',
+          JSON.stringify({
+            title: values.title || 'Eleição 2026',
+            config: payloadConfig,
+          }),
+        );
+      } catch (e) {
+        console.warn('LocalStorage limit reached or disabled', e);
+      }
 
       const res = await fetch('/api/matches', {
         method: 'POST',

@@ -33,6 +33,7 @@ export type GameScreenProps = {
   matchId?: string;
   title?: string;
   format?: 'vertical' | 'horizontal';
+  backgroundImageUrl?: string;
   candidateA: CandidateDisplay;
   candidateB: CandidateDisplay;
   state: BatalhaState;
@@ -67,6 +68,7 @@ type VoteLogItem = {
 
 export function GameScreen({
   title = 'Eleição 2026 · Apuração em Tempo Real',
+  backgroundImageUrl,
   candidateA,
   candidateB,
   state,
@@ -183,6 +185,13 @@ export function GameScreen({
         {
           '--cand-a-color': candidateA.color || '#10b981',
           '--cand-b-color': candidateB.color || '#ef4444',
+          ...(backgroundImageUrl
+            ? {
+                backgroundImage: `linear-gradient(rgba(7, 10, 18, 0.75), rgba(4, 9, 20, 0.90)), url(${backgroundImageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }
+            : {}),
         } as React.CSSProperties
       }
     >

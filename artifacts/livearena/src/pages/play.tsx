@@ -40,6 +40,41 @@ export function PlayGame() {
   const [title, setTitle] = useState('Eleição 2026 · Apuração ao Vivo');
   const [candidateA, setCandidateA] = useState<CandidateDisplay>(defaultCandidateA);
   const [candidateB, setCandidateB] = useState<CandidateDisplay>(defaultCandidateB);
+  const [backgroundImage, setBackgroundImage] = useState<string | undefined>(undefined);
+
+  // Carregar configuração salva localmente (caso esteja testando sem ID ou para ter prévia instantânea)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('livearena_active_config');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.title) setTitle(parsed.title);
+        if (parsed.config?.backgroundImage || parsed.config?.backgroundDataUrl) {
+          setBackgroundImage(parsed.config.backgroundDataUrl || parsed.config.backgroundImage);
+        }
+        if (parsed.config?.candidateA) {
+          const ca = parsed.config.candidateA;
+          setCandidateA((prev) => ({
+            ...prev,
+            name: ca.name || prev.name,
+            color: ca.color || prev.color,
+            avatarUrl: ca.avatarDataUrl || ca.avatarUrl || prev.avatarUrl,
+            gifts: ca.gifts?.length ? ca.gifts : prev.gifts,
+          }));
+        }
+        if (parsed.config?.candidateB) {
+          const cb = parsed.config.candidateB;
+          setCandidateB((prev) => ({
+            ...prev,
+            name: cb.name || prev.name,
+            color: cb.color || prev.color,
+            avatarUrl: cb.avatarDataUrl || cb.avatarUrl || prev.avatarUrl,
+            gifts: cb.gifts?.length ? cb.gifts : prev.gifts,
+          }));
+        }
+      }
+    } catch {}
+  }, []);
 
   const [state, setState] = useState<BatalhaState>(() =>
     createInitialState({
@@ -81,6 +116,9 @@ export function PlayGame() {
         if (data?.match?.config) {
           const cfg = data.match.config;
           if (data.match.title) setTitle(data.match.title);
+          if (cfg.backgroundDataUrl || cfg.backgroundImage) {
+            setBackgroundImage(cfg.backgroundDataUrl || cfg.backgroundImage);
+          }
 
           if (cfg.candidateA) {
             setCandidateA((prev) => ({
@@ -235,6 +273,7 @@ export function PlayGame() {
     <GameScreen
       matchId={matchId}
       title={title}
+      backgroundImageUrl={backgroundImage}
       candidateA={candidateA}
       candidateB={candidateB}
       state={state}
